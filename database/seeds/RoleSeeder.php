@@ -13,7 +13,7 @@ class RoleSeeder extends Seeder
     public function run()
     {
 
-        $roles = ['Administrator', 'Manager', 'Operator'];
+        $roles = ['administrator', 'manager', 'operator'];
         $roleCount = count($roles);
 
         for ($i = 0; $i < $roleCount; $i++) {
