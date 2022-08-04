@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RouteSeeder::class);
         $this->call(FeatureSeeder::class);
         $this->call(ComponentSeeder::class);
+        $this->call(ComponentRoleRouteSeeder::class);
         
     }
 }
