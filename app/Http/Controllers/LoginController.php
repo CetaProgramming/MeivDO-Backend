@@ -29,7 +29,7 @@ class LoginController extends Controller
             }
 
             $userLogin = $this->verifUser($request);
-
+            
             return response()->json([
                 $userLogin->data(),
             ], 200);
