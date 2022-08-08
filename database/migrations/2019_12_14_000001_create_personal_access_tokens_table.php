@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Http\Request;
 
 class CreatePersonalAccessTokensTable extends Migration
 {
@@ -18,8 +19,10 @@ class CreatePersonalAccessTokensTable extends Migration
             $table->morphs('tokenable');
             $table->string('name');
             $table->string('token', 64)->unique();
+            $table->ipAddress('access_ip')->default(request()->ip());
             $table->text('abilities')->nullable();
             $table->timestamp('last_used_at')->nullable();
+            $table->timestamp('expired_at')->default(now()->addDays(3));
             $table->timestamps();
         });
     }
