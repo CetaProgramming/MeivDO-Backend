@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Role;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Http\Request;
 
 class Login extends User
 {
@@ -17,21 +18,21 @@ class Login extends User
 
         $roleData = Role::find($this->role_id);
 
-        if($this->tokens()->count())
-            $this->tokens()->delete();
-
-        $token = $this->createToken('access_aplication')->plainTextToken;
-
         $this->role = [
             "id" => $roleData->id,
             "name" => $roleData->name,
             "permissions" => $roleData->permissions($this->role_id),
-            "token" => [
-                "access_token" => $token,
-                "type" => "Bearer"
-            ]
         ];
         return $this;
+    }
+
+    public function deleteToken(Request $request){
+        try {
+            if($this->tokens()->count())
+                $request->user()->currentAccessToken()->delete();
+        } catch (\Exception $exception) {
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        } 
     }
 
 }
