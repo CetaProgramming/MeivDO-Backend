@@ -15,10 +15,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/login', 'LoginController@login');
+Route::post('/logout', 'LoginController@logout');
 
-Route::middleware('auth:sanctum')->group(function (){
-    Route::get('/infouser', 'LoginController@user');
-    Route::post('/logout', 'LoginController@logout');
+Route::middleware(['auth:sanctum'])->group(function (){
+    Route::get('/user', 'LoginController@user');
     Route::get('/test', function(Request $request){
         return response()->json('dsadas', 200);
     });
