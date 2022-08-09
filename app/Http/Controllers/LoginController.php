@@ -26,12 +26,9 @@ class LoginController extends Controller
             if (!Auth::attempt(['email' => $request->email, 'password' => $request->password, 'active' => 1]))
                 throw new \Exception('Invalid credentials', 401);
                 
-
             $request->session()->regenerate();
 
-            $user = Auth::user();
-
-            return response()->json($user, 200);  
+            return response()->json(Auth::user()->data(), 200);  
 
         } catch (\Exception $exception) {
             return response()->json(['error' => $exception->getMessage()], $exception->getCode()) ;
@@ -40,8 +37,7 @@ class LoginController extends Controller
 
     public function user(Request $request){
         try {
-            return $request;
-            // return response()->json(, 200);  
+            return response()->json(Auth::user()->data(), 200);  
         } catch (\Exception $exception) {
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
             return response()->json(['error' => $exception], 500);
