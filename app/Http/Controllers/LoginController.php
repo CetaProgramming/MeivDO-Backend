@@ -22,7 +22,7 @@ class LoginController extends Controller
                 'email' => ['required', 'email'],
                 'password' => ['required'],
             ]);
-            
+
             if (!Auth::attempt(['email' => $request->email, 'password' => $request->password, 'active' => 1]))
                 throw new \Exception('Invalid credentials', 401);
                 
@@ -31,7 +31,7 @@ class LoginController extends Controller
             return response()->json(Auth::user()->data(), 200);  
 
         } catch (\Exception $exception) {
-            return response()->json(['error' => $exception->getMessage()], $exception->getCode()) ;
+            return response()->json(['message' => $exception->getMessage()], $exception->getCode()) ;
         }        
     }
 
@@ -39,16 +39,16 @@ class LoginController extends Controller
         try {
             return response()->json(Auth::user()->data(), 200);  
         } catch (\Exception $exception) {
-            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
-            return response()->json(['error' => $exception], 500);
+            return response()->json(['message' => $exception->getMessage()], $exception->getCode());
         }
     }
 
     public function logout(Request $request){
         try {
             Auth::logout();
+            return response()->json(['message' => "See you soon, come back when you need"], 200);  
         } catch (\Exception $exception) {
-            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+            return response()->json(['message' => $exception->getMessage()], $exception->getCode());
         }
     }
 }
