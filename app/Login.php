@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class Login extends User
 {
@@ -13,6 +14,9 @@ class Login extends User
     protected $hidden = ['role_id', 'password', 'active', 'user_id', 'created_at', 'updated_at', 'deleted_at'];
 
     public function data(){
+
+        if(!$this->image)
+            $this->image = '/storage/default/default-profile.png';
 
         $roleData = Role::find($this->role_id);
 
