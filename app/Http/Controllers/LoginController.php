@@ -28,7 +28,7 @@ class LoginController extends Controller
                 Log::error("Try access with email {$request->email} but not is possible!");
                 throw new \Exception('Invalid credentials', 401);
             }
-                
+
             $request->session()->regenerate();
 
             Log::info("User with email {$request->email} started a new session");
@@ -37,7 +37,7 @@ class LoginController extends Controller
 
         } catch (\Exception $exception) {
             Log::error("Occurred exception: {$exception->getMessage()}");
-            return response()->json(['message' => $exception->getMessage()], $exception->getCode()) ;
+            return response()->json(['error' => 'Something went wrong, sorry!'], 500);
         }        
     }
 
@@ -47,18 +47,20 @@ class LoginController extends Controller
             return response()->json(Auth::user()->data(), 200);  
         } catch (\Exception $exception) {
             Log::error("Occurred exception: {$exception->getMessage()}");
-            return response()->json(['message' => $exception->getMessage()], $exception->getCode());
+            return response()->json(['error' => 'Something went wrong, sorry!'], 500);
         }
     }
 
     public function logout(Request $request){
         try {
+            if(!Auth::id())
+                throw new \Exception("First, you have to log in!", 401);
             Log::info("User ".Auth::id()." do logout");
             Auth::logout();
             return response()->json(['message' => "See you soon, come back when you need"], 200);  
         } catch (\Exception $exception) {
             Log::error("Occurred exception: {$exception->getMessage()}");
-            return response()->json(['message' => $exception->getMessage()], $exception->getCode());
+            return response()->json(['error' => 'Something went wrong, sorry!'], 500);
         }
     }
 }
