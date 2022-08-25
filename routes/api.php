@@ -19,7 +19,5 @@ Route::get('/logout', 'LoginController@logout');
 
 Route::middleware(['auth:sanctum'])->group(function (){
     Route::get('/user', 'LoginController@user');
-    Route::get('/test', function(Request $request){
-        return response()->json('dsadas', 200);
-    });
+    Route::get('/roles','RoleController@index');
 });
