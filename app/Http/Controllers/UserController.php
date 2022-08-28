@@ -14,15 +14,23 @@ class UserController extends Controller
     {
         $request =Auth::user();
         try {
-            //Log::info("User with email {$request->email} started a new session");
+            Log::info("User with email {$request->email} started a new session");
             return response()->json(DB::table('users')->paginate(15), 200);
         } catch (\Exception $exception) {
-            //Log::error("Try access with email {$request->email} but not is possible!");
+            Log::error("Try access with email {$request->email} but not is possible!");
             return response()->json(['error' => $exception], 500);
         }
 
     }
-
+    public function store(Request $request)
+    {
+        try {
+            $user = User::create($request->all());
+            return response()->json($user, 201);
+        } catch (Exception $exception) {
+            return response()->json(['error' => $exception], 500);
+        }
+    }
 
     public function update(Request $request,  $id)
     {
@@ -52,14 +60,15 @@ class UserController extends Controller
         try {
             $User = DB::table('users')->where('id', $id );
             if ($User->exists()) {
-            $User->delete();
-           // Log::info("User with email {$request->email} deleted user number {$id}");
+                $User->delete();
+                // Log::info("User with email {$request->email} deleted user number {$id}");
                 return response()->json(['message' => 'Deleted'], 200);
             }
-           else{
-              // Log::error("User with email {$request->email} try to delete user number {$id} but was not possible!");
-               return response()->json(['error' => "User with id: {$id} dont exist"], 500);
-           }
+            else{
+                // Log::error("User with email {$request->email} try to delete user number {$id} but was not possible!");
+                return response()->json(['error' => "User with id: {$id} dont exist"], 500);
+            }
+
         } catch (Exception $exception) {
             return response()->json(['error' => $exception], 500);
         }

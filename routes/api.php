@@ -16,9 +16,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', 'LoginController@login');
 Route::get('/logout', 'LoginController@logout');
+Route::post('/users', 'UserController@store');
 
 Route::middleware(['auth:sanctum'])->group(function (){
-    Route::get('/user', 'LoginController@user');
     Route::get('/user', 'LoginController@user');
     Route::delete('/users/{id}', 'UserController@destroy');
     Route::put('/users/{id}', 'UserController@update');
