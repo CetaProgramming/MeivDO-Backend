@@ -16,10 +16,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', 'LoginController@login');
 Route::get('/logout', 'LoginController@logout');
-Route::put('/users/{id}', 'UserController@update');
-Route::get('/users', 'UserController@index');
+Route::post('/users', 'UserController@store');
 Route::middleware(['auth:sanctum'])->group(function (){
     Route::get('/user', 'LoginController@user');
-
+    Route::put('/users/{id}', 'UserController@update');
+    Route::get('/users', 'UserController@index');
     Route::get('/roles','RoleController@index');
 });

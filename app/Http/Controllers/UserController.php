@@ -14,15 +14,23 @@ class UserController extends Controller
     {
         $request =Auth::user();
         try {
-            //Log::info("User with email {$request->email} started a new session");
+            Log::info("User with email {$request->email} started a new session");
             return response()->json(DB::table('users')->paginate(15), 200);
         } catch (\Exception $exception) {
-            //Log::error("Try access with email {$request->email} but not is possible!");
+            Log::error("Try access with email {$request->email} but not is possible!");
             return response()->json(['error' => $exception], 500);
         }
 
     }
-
+    public function store(Request $request)
+    {
+        try {
+            $user = User::create($request->all());
+            return response()->json($user, 201);
+        } catch (Exception $exception) {
+            return response()->json(['error' => $exception], 500);
+        }
+    }
 
     public function update(Request $request,  $id)
     {
