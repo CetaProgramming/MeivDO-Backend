@@ -54,11 +54,20 @@ class UserController extends Controller
     }
 
 
-    public function destroy(Bicycle $bicycle)
+    public function destroy($id)
     {
+        $request =Auth::user();
         try {
-            $bicycle->delete();
-            return response()->json(['message' => 'Deleted'], 205);
+            $User = DB::table('users')->where('id', $id );
+            if ($User->exists()) {
+                $User->delete();
+                // Log::info("User with email {$request->email} deleted user number {$id}");
+                return response()->json(['message' => 'Deleted'], 200);
+            }
+            else{
+                // Log::error("User with email {$request->email} try to delete user number {$id} but was not possible!");
+                return response()->json(['error' => "User with id: {$id} dont exist"], 500);
+            }
         } catch (Exception $exception) {
             return response()->json(['error' => $exception], 500);
         }
