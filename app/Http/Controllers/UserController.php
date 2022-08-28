@@ -68,6 +68,7 @@ class UserController extends Controller
                 // Log::error("User with email {$request->email} try to delete user number {$id} but was not possible!");
                 return response()->json(['error' => "User with id: {$id} dont exist"], 500);
             }
+
         } catch (Exception $exception) {
             return response()->json(['error' => $exception], 500);
         }
