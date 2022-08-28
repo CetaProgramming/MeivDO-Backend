@@ -19,5 +19,6 @@ Route::get('/logout', 'LoginController@logout');
 
 Route::middleware(['auth:sanctum'])->group(function (){
     Route::get('/user', 'LoginController@user');
+    Route::get('/users', 'UserController@index');
     Route::get('/roles','RoleController@index');
 });
