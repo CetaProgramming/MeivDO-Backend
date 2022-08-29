@@ -43,6 +43,15 @@ class UserController extends Controller
             if (!$user) {
                 throw new \Exception("User with id: {$id} dont exist", 500);
             }
+            $validator = \Validator::make($request->all(),[
+                'name'        => 'required',
+                'email'     => 'required|unique:users,email,'.$user->id,
+                //'image'       => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'role_id' => 'required',
+            ]);
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first(), 500);
+            }
             $user->update($request->all());
                 //Log::info("User with email {$Auth->email} updated user number {$id} successfully");
                 return response()->json($user, 200);
