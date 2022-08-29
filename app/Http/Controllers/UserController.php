@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Role;
+
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,15 +10,17 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 class UserController extends Controller
 {
+
+
     public function index()
     {
-        $request =Auth::user();
+        $Auth=Auth::user();
         try {
-            Log::info("User with email {$request->email} started a new session");
-            return response()->json(DB::table('users')->paginate(15), 200);
+            Log::info("User with email {$Auth->email} get users successfully");
+            return response()->json(User::paginate(15), 200);
         } catch (\Exception $exception) {
-            Log::error("Try access with email {$request->email} but not is possible!");
-            return response()->json(['error' => $exception], 500);
+            Log::error("User with email {$Auth->email} try get users but not successfully!");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
 
     }
@@ -34,43 +36,40 @@ class UserController extends Controller
 
     public function update(Request $request,  $id)
     {
+        $Auth=Auth::user();
+        //Make o validate como fiz no store
         try {
-
-            $User = DB::table('users')->where('id', $id );
-
-            if ($User->exists()) {
-                $User->update($request->all());
-                Log::info("User with email {$request->email} updated user number {$id}");
-                return response()->json($User->paginate(1), 200);
+           $user= User::find($id);
+            if (!$user) {
+                throw new \Exception("User with id: {$id} dont exist", 500);
             }
-            else{
-                Log::error("User with email {$request->email} try update user number {$id} but was not possible!");
-                return response()->json(['error' => "User with id: {$id} dont exist"], 500);
-            }
-        } catch (Exception $exception) {
-            Log::error("Try access update of users with email {$request->email} but not is possible!");
-            return response()->json(['error' => $exception], 500);
+            $user->update($request->all());
+                //Log::info("User with email {$Auth->email} updated user number {$id} successfully");
+                return response()->json($user, 200);
+        } catch (\Exception $exception) {
+            //Log::error("Try access update of users with email {$Auth->email} but not is possible!Message error({$exception->getMessage()}");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
 
 
     public function destroy($id)
     {
-        $request =Auth::user();
+        $Auth =Auth::user();
         try {
-            $User = DB::table('users')->where('id', $id );
-            if ($User->exists()) {
-                $User->delete();
+            $user= User::find($id);
+            if (!$user) {
+                throw new \Exception("User with id: {$id} dont exist", 500);
+            }
+                $user->delete();
                 // Log::info("User with email {$request->email} deleted user number {$id}");
                 return response()->json(['message' => 'Deleted'], 200);
-            }
-            else{
-                // Log::error("User with email {$request->email} try to delete user number {$id} but was not possible!");
-                return response()->json(['error' => "User with id: {$id} dont exist"], 500);
-            }
+
+
 
         } catch (Exception $exception) {
-            return response()->json(['error' => $exception], 500);
+            //Log::error("Try access destroy of users with email {$Auth->email} but not is possible!Message error({$exception->getMessage()})");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
 }
