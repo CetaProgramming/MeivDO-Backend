@@ -46,7 +46,7 @@ class UserController extends Controller
             $validator = \Validator::make($request->all(),[
                 'name'        => 'required',
                 'email'     => 'required|unique:users,email,'.$user->id,
-                //'image'       => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image'       => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'role_id' => 'required',
             ]);
             if ($validator->fails()) {
