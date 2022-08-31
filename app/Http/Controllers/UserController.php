@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 class UserController extends Controller
 {
     public function index()
@@ -27,7 +28,7 @@ class UserController extends Controller
         try {
             $validator = \Validator::make($request->all(),[
                 'name'        => 'required',
-                'email'     => 'required|unique:users',
+                'email'     => 'required|unique:users|email:rfc,dns',
                 'image'       => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'role_id' => 'required',
             ]);
@@ -38,16 +39,16 @@ class UserController extends Controller
             $user->name=$request->name;
             $user->email=$request->email;
             $user->password= bcrypt($request->name.'123');
-            $user->image=$request->image;
+
             $user->active=1;
             //$user->user_id =Auth::user()->id;
             $user->role_id=$request->role_id;
             $user->save();
             if ($request->file('image')) {
                 $imagePath = $request->file('image');
-                $imageName =  $user->id . '_' .  time() . '_' .  $imagePath->getClientOriginalName();
-
-                $path = $request->file('image')->storeAs('images/users/' . $user->id, $imageName, 'public');
+                $imageName =  Str::of($imagePath->getClientOriginalName())->split('/[\s.]+/');
+                $path = $request->file('image')->storeAs('images/users/' . $user->id,$user->id."_profile.". $imageName[1], 'public');
+                $user->image=$path;
             }
             $user->save();
            // Log::info("User with email {"$request->email"} created user number {$user->id}");
