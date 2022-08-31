@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 class UserController extends Controller
 {
 
@@ -16,10 +18,10 @@ class UserController extends Controller
     {
         $Auth=Auth::user();
         try {
-           // Log::info("User with email {$Auth->email} get users successfully");
+            Log::info("User with email {$Auth->email} get users successfully");
             return response()->json(User::paginate(15), 200);
         } catch (\Exception $exception) {
-           // Log::error("User with email {$Auth->email} try get users but not successfully!");
+            Log::error("User with email {$Auth->email} try get users but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
 
@@ -37,7 +39,7 @@ class UserController extends Controller
     public function update(Request $request,  $id)
     {
         $Auth=Auth::user();
-        //Make o validate como fiz no store
+
         try {
            $user= User::find($id);
             if (!$user) {
@@ -56,14 +58,14 @@ class UserController extends Controller
             if ($request->file('image')) {
                 $imagePath = $request->file('image');
                 $imageName =  Str::of($imagePath->getClientOriginalName())->split('/[\s.]+/');
-                $path = $request->file('image')->storeAs('images/users/' . $user->id,$user->id."_profile.". $imageName[1], 'public');
+                $path = $request->file('image')->store('images/users/' . $user->id,$user->id."_profile.". $imageName[1], 'public');
                 $user->image=$path;
             }
             $user->update($request->all());
-                //Log::info("User with email {$Auth->email} updated user number {$id} successfully");
+                Log::info("User with email {$Auth->email} updated user number {$id} successfully");
                 return response()->json($user, 200);
         } catch (\Exception $exception) {
-            //Log::error("Try access update of users with email {$Auth->email} but not is possible!Message error({$exception->getMessage()}");
+            Log::error("Try access update of users with email {$Auth->email} but not is possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
@@ -78,13 +80,14 @@ class UserController extends Controller
                 throw new \Exception("User with id: {$id} dont exist", 500);
             }
                 $user->delete();
-                // Log::info("User with email {$request->email} deleted user number {$id}");
+                Log::info("User with email {$request->email} deleted user number {$id}");
+                Storage::deleteDirectory('public/images/users/' . $user->id);
                 return response()->json(['message' => 'Deleted'], 200);
 
 
 
         } catch (Exception $exception) {
-            //Log::error("Try access destroy of users with email {$Auth->email} but not is possible!Message error({$exception->getMessage()})");
+            Log::error("Try access destroy of users with email {$Auth->email} but not is possible!Message error({$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }

@@ -18,11 +18,12 @@ Route::post('/login', 'LoginController@login');
 Route::get('/logout', 'LoginController@logout');
 Route::get('/users', 'UserController@index');
 Route::put('/users/{id}', 'UserController@update');
+Route::delete('/users/{id}', 'UserController@destroy');
 Route::middleware(['auth:sanctum'])->group(function (){
     Route::get('/user', 'LoginController@user');
 
     Route::post('/users', 'UserController@store');
-    Route::delete('/users/{id}', 'UserController@destroy');
+
 
     Route::get('/roles','RoleController@index');
 });
