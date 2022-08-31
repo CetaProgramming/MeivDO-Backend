@@ -16,10 +16,10 @@ class UserController extends Controller
     {
         $Auth=Auth::user();
         try {
-            Log::info("User with email {$Auth->email} get users successfully");
+           // Log::info("User with email {$Auth->email} get users successfully");
             return response()->json(User::paginate(15), 200);
         } catch (\Exception $exception) {
-            Log::error("User with email {$Auth->email} try get users but not successfully!");
+           // Log::error("User with email {$Auth->email} try get users but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
 
@@ -51,6 +51,13 @@ class UserController extends Controller
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
+            }
+
+            if ($request->file('image')) {
+                $imagePath = $request->file('image');
+                $imageName =  Str::of($imagePath->getClientOriginalName())->split('/[\s.]+/');
+                $path = $request->file('image')->storeAs('images/users/' . $user->id,$user->id."_profile.". $imageName[1], 'public');
+                $user->image=$path;
             }
             $user->update($request->all());
                 //Log::info("User with email {$Auth->email} updated user number {$id} successfully");
