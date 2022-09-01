@@ -56,10 +56,10 @@ class UserController extends Controller
                 $user->image=$path;
             }
             $user->save();
-           // Log::info("User with email { $Auth->email} created user number {$user->id}");
+            Log::info("User with email { $Auth->email} created user number {$user->id}");
             return response()->json($user, 201);
         } catch (\Exception $exception) {
-            //Log::error("User with email { $Auth->email} receive an error on Users( {$exception->getMessage()})");
+            Log::error("User with email { $Auth->email} receive an error on Users( {$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
@@ -90,11 +90,10 @@ class UserController extends Controller
             }
 
             $user->update($request->all());
-
-               // Log::info("User with email {$Auth->email} updated user number {$id} successfully");
-                return response()->json($user, 200);
+            Log::info("User with email {$Auth->email} updated user number {$id} successfully");
+            return response()->json($user, 200);
         } catch (\Exception $exception) {
-           // Log::error("Try access update of users with email {$Auth->email} but not is possible!Message error({$exception->getMessage()}");
+            Log::error("Try access update of users with email {$Auth->email} but not is possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
