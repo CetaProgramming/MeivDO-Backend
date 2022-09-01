@@ -31,6 +31,7 @@ class UserController extends Controller
     }
     public function store(Request $request)
     {
+        $Auth=Auth::user();
         try {
             $validator = \Validator::make($request->all(),[
                 'name'        => 'required',
@@ -45,9 +46,7 @@ class UserController extends Controller
             $user->name=$request->name;
             $user->email=$request->email;
             $user->password= bcrypt($request->name.'123');
-
             $user->active=1;
-            //$user->user_id =Auth::user()->id;
             $user->role_id=$request->role_id;
             $user->save();
             if ($request->file('image')) {
@@ -57,10 +56,10 @@ class UserController extends Controller
                 $user->image=$path;
             }
             $user->save();
-           // Log::info("User with email {"$request->email"} created user number {$user->id}");
+           // Log::info("User with email { $Auth->email} created user number {$user->id}");
             return response()->json($user, 201);
         } catch (\Exception $exception) {
-            Log::error("User with email {$request->email} receive an error on Users( {$exception->getMessage()})");
+            //Log::error("User with email { $Auth->email} receive an error on Users( {$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
@@ -83,18 +82,19 @@ class UserController extends Controller
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-
             if ($request->file('image')) {
                 $imagePath = $request->file('image');
                 $imageName =  Str::of($imagePath->getClientOriginalName())->split('/[\s.]+/');
-                $path = $request->file('image')->store('images/users/' . $user->id,$user->id."_profile.". $imageName[1], 'public');
+                $path = $request->file('image')->storeAs('images/users/' . $user->id,$user->id."_profile.". $imageName[1], 'public');
                 $user->image=$path;
             }
+
             $user->update($request->all());
-                Log::info("User with email {$Auth->email} updated user number {$id} successfully");
+
+               // Log::info("User with email {$Auth->email} updated user number {$id} successfully");
                 return response()->json($user, 200);
         } catch (\Exception $exception) {
-            Log::error("Try access update of users with email {$Auth->email} but not is possible!Message error({$exception->getMessage()}");
+           // Log::error("Try access update of users with email {$Auth->email} but not is possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
@@ -109,7 +109,7 @@ class UserController extends Controller
                 throw new \Exception("User with id: {$id} dont exist", 500);
             }
                 $user->delete();
-                Log::info("User with email {$request->email} deleted user number {$id}");
+                Log::info("User with email {$Auth->email} deleted user number {$id}");
                 Storage::deleteDirectory('public/images/users/' . $user->id);
                 return response()->json(['message' => 'Deleted'], 200);
 
