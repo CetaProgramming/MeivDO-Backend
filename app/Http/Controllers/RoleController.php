@@ -11,12 +11,13 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $request =Auth::user();
+        $Auth=Auth::user();
+
         try {
-           Log::info("User with email {$request->email} started a new session");
+           Log::info("User with email { $Auth->email} get roles successfully");
             return response()->json(Role::all(), 200);
         } catch (\Exception $exception) {
-            Log::error("Try access with email {$request->email} but not is possible!");
+            Log::error("Try access with email { $Auth->email} try get roles but not successfully!");
             return response()->json(['error' => $exception], 500);
         }
     }
