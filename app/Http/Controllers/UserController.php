@@ -96,7 +96,30 @@ class UserController extends Controller
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
+    public function updatePassword(Request $request)
+    {
 
+        $Auth=Auth::user();
+
+        try {
+
+            $user= User::find($Auth->id);
+
+            $validator = \Validator::make($request->all(),[
+                'password'        => 'required',
+            ]);
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first(), 500);
+            }
+            $user->password =bcrypt($request->password);
+            $user->save();
+            Log::info("User with email {$Auth->email} change is password successfully");
+            return response()->json($user, 200);
+        } catch (\Exception $exception) {
+            Log::error("User with email {$Auth->email} try to change is password but not is possible!Message error({$exception->getMessage()}");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
 
     public function destroy($id)
     {
