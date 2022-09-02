@@ -17,11 +17,13 @@ class IsAccess
      */
     public function handle($request, Closure $next)
     {
+
         $Auth=Auth::user();
-        $method = $request->server('REQUEST_METHOD');
-        $userPermissions=  $Auth->data()->role['permissions'];
-        $path = Str::of($request->path())->split('%[/]+%')[1];
-        $countUserPermissions=count($userPermissions);
+        $method = $request->server('REQUEST_METHOD'); //GET
+        $userPermissions=  $Auth->data()->role['permissions']; //Array permissões
+        $path = Str::of($request->path())->split('%[/]+%')[1];//Users
+        $countUserPermissions=count($userPermissions); //5
+        dd($userPermissions);
         for ($i=0;$i<$countUserPermissions;$i++){
             if($userPermissions[$i]['feature'] == $path){
                 $countUserPermissionsRoutes=count($userPermissions[$i]['routes']);

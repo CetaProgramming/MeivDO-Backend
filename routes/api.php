@@ -18,13 +18,15 @@ Route::post('/login', 'LoginController@login');
 Route::get('/logout', 'LoginController@logout');
 
 
-Route::middleware(['auth:sanctum','isAccess'])->group(function (){
-    Route::get('/user', 'LoginController@user');
-    Route::post('/users', 'UserController@store');
-    Route::put('/users/{id}', 'UserController@update');
+Route::middleware(['auth:sanctum'])->group(function (){
+    Route::middleware(['isAccess'])->group(function () {
+        Route::post('/users', 'UserController@store');
+        Route::put('/users/{id}', 'UserController@update');
+        Route::get('/users', 'UserController@index');
+        Route::delete('/users/{id}', 'UserController@destroy');
+    });
     Route::get('/roles','RoleController@index');
-    Route::get('/users', 'UserController@index');
-    Route::delete('/users/{id}', 'UserController@destroy');
-
+    Route::get('/user', 'LoginController@user');
+    Route::put('/changePassword','UserController@updatePassword');
 });
 
