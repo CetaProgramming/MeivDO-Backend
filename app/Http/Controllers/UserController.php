@@ -19,7 +19,6 @@ class UserController extends Controller
     {
         $Auth=Auth::user();
         try {
-
             Log::info("User with email {$Auth->email} get users successfully");
             return response()->json(User::paginate(15), 200);
         } catch (\Exception $exception) {
