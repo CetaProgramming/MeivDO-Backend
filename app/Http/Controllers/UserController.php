@@ -44,7 +44,7 @@ class UserController extends Controller
             $user= new User();
             $user->name=$request->name;
             $user->email=$request->email;
-            $user->password= bcrypt($request->name.'123');
+            $user->password= bcrypt($user->name.'123');
             $user->active=1;
             $user->role_id=$request->role_id;
             $user->save();
@@ -112,6 +112,7 @@ class UserController extends Controller
                 throw new \Exception($validator->errors()->first(), 500);
             }
             $user->password =bcrypt($request->password);
+            $user->validate=1;
             $user->save();
             Log::info("User with email {$Auth->email} change is password successfully");
             return response()->json($user, 200);
@@ -120,7 +121,26 @@ class UserController extends Controller
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
+    public function resetPassword(Request $request,$id)
+    {
 
+        $Auth=Auth::user();
+
+        try {
+                $user= User::find($id);
+                if (!$user) {
+                    throw new \Exception("User with id: {$id} dont exist", 500);
+                }
+            $user->password =bcrypt($user->name.'123');
+            $user->validate=0;
+            $user->save();
+            Log::info("User with email {$Auth->email} reset the password of user with id {$id} successfully");
+            return response()->json($user, 200);
+        } catch (\Exception $exception) {
+            Log::error("User with email {$Auth->email} try to reset the password of user with id {$id} but not is possible!Message error({$exception->getMessage()}");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
     public function destroy($id)
     {
         $Auth =Auth::user();

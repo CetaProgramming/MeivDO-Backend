@@ -22,6 +22,7 @@ class CreateUsersTable extends Migration
             $table->boolean('active');
             $table->foreignId('role_id')->constrained();
             $table->integer('user_id')->nullable();
+            $table->boolean('validate')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
