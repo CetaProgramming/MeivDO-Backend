@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 class IsAccess
 {
     /**
@@ -19,23 +20,26 @@ class IsAccess
     {
 
         $Auth=Auth::user();
-        $method = $request->server('REQUEST_METHOD'); //GET
-        $userPermissions=  $Auth->data()->role['permissions']; //Array permissões
-        $path = Str::of($request->path())->split('%[/]+%')[1];//Users
-        $countUserPermissions=count($userPermissions); //5
-        dd($userPermissions);
+        $method = $request->server('REQUEST_METHOD');
+        $userPermissions=  $Auth->data()->role['permissions'];
+        $path = Str::of($request->path())->split('%[/]+%');//Users
+        $countUserPermissions=count($userPermissions);
+        if($method=="PUT"&&$path[2]==strval($Auth->id)&&$path[1]=="users"){
+            Log::info("User with email {$Auth->email} enter {$path[1]} successfully");
+            return $next($request);
+        }
         for ($i=0;$i<$countUserPermissions;$i++){
-            if($userPermissions[$i]['feature'] == $path){
+            if($userPermissions[$i]['feature'] == $path[1]){
                 $countUserPermissionsRoutes=count($userPermissions[$i]['routes']);
                  for($j=0;$j< $countUserPermissionsRoutes;$j++){
                      if(strtoupper($userPermissions[$i]['routes'][$j])==$method){
-                         Log::info("User with email {$Auth->email} enter users successfully");
+                         Log::info("User with email {$Auth->email} enter {$path[1]} successfully");
                         return $next($request);
                      }
                  }
             }
         }
-        Log::error("User with email {$Auth->email} try enter users  but not successfully!");
+        Log::error("User with email {$Auth->email} try enter {$path[1]}  but not successfully!");
         return response()->json(['error' =>"Forbidden access" ], 403);
 
 
