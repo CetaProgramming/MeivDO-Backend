@@ -22,11 +22,13 @@ Route::middleware(['auth:sanctum'])->group(function (){
     Route::middleware(['isAccess'])->group(function () {
         Route::post('/users', 'UserController@store');
         Route::put('/users/{id}', 'UserController@update');
+        Route::put('/users/resetPassword/{id}','UserController@resetPassword');
         Route::get('/users', 'UserController@index');
         Route::delete('/users/{id}', 'UserController@destroy');
     });
     Route::get('/roles','RoleController@index');
     Route::get('/user', 'LoginController@user');
     Route::put('/changePassword','UserController@updatePassword');
+
 });
 
