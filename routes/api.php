@@ -25,6 +25,7 @@ Route::middleware(['auth:sanctum'])->group(function (){
         Route::put('/users/resetPassword/{id}','UserController@resetPassword');
         Route::get('/users', 'UserController@index');
         Route::delete('/users/{id}', 'UserController@destroy');
+        Route::get('/tools/groups', 'GroupToolController@index');
     });
     Route::get('/roles','RoleController@index');
     Route::get('/user', 'LoginController@user');
