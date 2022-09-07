@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ComponentSeeder::class);
         $this->call(ComponentRoleRouteSeeder::class);
         $this->call(UserSeeder::class);
-
+        $this->call(CategoryToolSeeder::class);
+        $this->call(GroupToolSeeder::class);
     }
 }
