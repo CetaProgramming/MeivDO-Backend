@@ -11,6 +11,20 @@ use Illuminate\Support\Str;
 
 class CategoryToolController extends Controller
 {
+    public function index()
+    {
+        $Auth=Auth::user();
+
+        try {
+
+            Log::info("User with email {$Auth->email} get categoryTools successfully");
+            return response()->json(categoryTool::with(['groupTools'])->paginate(15), 200);
+        } catch (\Exception $exception) {
+            Log::error("User with email {$Auth->email} try get categoryTools but not successfully!");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+
+        }
+    }
     public function store(Request $request)
     {
         $Auth=Auth::user();
