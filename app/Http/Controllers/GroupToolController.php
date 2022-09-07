@@ -7,6 +7,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class GroupToolController extends Controller
@@ -90,7 +91,24 @@ class GroupToolController extends Controller
             Log::info("User with email {$Auth->email} updated groupTool number {$id} successfully");
             return response()->json($groupTool, 200);
         } catch (\Exception $exception) {
-            Log::error("Try access update of groupTool with email {$Auth->email} but is not possible!Message error({$exception->getMessage()}");
+            Log::error("User with email {$Auth->email} try access update on groupTool but is not possible!Message error({$exception->getMessage()}");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
+    public function destroy($id)
+    {
+        $Auth =Auth::user();
+        try {
+            $groupTool= groupTool::find($id);
+            if (! $groupTool) {
+                throw new \Exception("GroupTool with id: {$id} dont exist", 500);
+            }
+            $groupTool->delete();
+            Log::info("User with email {$Auth->email} deleted groupTool number {$id}");
+            Storage::deleteDirectory('public/images/groupTool/' .  $groupTool->id);
+            return response()->json(['message' => 'Deleted'], 200);
+        } catch (Exception $exception) {
+            Log::error("User with email {$Auth->email} try access destroy  on groupTool but  is not possible!Message error({$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
