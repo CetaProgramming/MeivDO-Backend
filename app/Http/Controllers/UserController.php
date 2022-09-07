@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
@@ -107,11 +108,17 @@ class UserController extends Controller
 
             $validator = \Validator::make($request->all(),[
                 'password'        => 'required',
+                'newPassword'     => 'required',
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-            $user->password =bcrypt($request->password);
+
+            if(!Hash::check($request->password,$user->password)){
+                throw new \Exception("Password dont match", 500);
+            }
+
+            $user->password =bcrypt($request->newPassword);
             $user->validate=1;
             $user->save();
             Log::info("User with email {$Auth->email} change is password successfully");
