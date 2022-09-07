@@ -9,7 +9,8 @@ class categoryTool extends Model
 {
     protected $fillable = ['name'];
     use SoftDeletes;
+
     public function groupTools(){
-        return $this->hasMany('App\groupTool');
+        return $this->hasMany('App\groupTool','category_tools_id','id');
     }
 }
