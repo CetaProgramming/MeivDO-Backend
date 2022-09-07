@@ -26,6 +26,7 @@ Route::middleware(['auth:sanctum'])->group(function (){
         Route::get('/users', 'UserController@index');
         Route::delete('/users/{id}', 'UserController@destroy');
         Route::get('/tools/groups', 'GroupToolController@index');
+        Route::post('/tools/groups', 'GroupToolController@store');
     });
     Route::get('/roles','RoleController@index');
     Route::get('/user', 'LoginController@user');
