@@ -45,4 +45,27 @@ class CategoryToolController extends Controller
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
+    public function update(Request $request,  $id)
+    {
+        $Auth=Auth::user();
+
+        try {
+            $categoryTool= categoryTool::find($id);
+            if (!$categoryTool) {
+                throw new \Exception("CategoryTool with id: {$id} dont exist", 500);
+            }
+            $validator = \Validator::make($request->all(),[
+                'name' => 'required',
+            ]);
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first(), 500);
+            }
+            $categoryTool->update($request->all());
+            Log::info("User with email {$Auth->email} updated categoryTool number {$id} successfully");
+            return response()->json($categoryTool, 200);
+        } catch (\Exception $exception) {
+            Log::error("User with email {$Auth->email} try access update on categoryTool but is not possible!Message error({$exception->getMessage()}");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
 }
