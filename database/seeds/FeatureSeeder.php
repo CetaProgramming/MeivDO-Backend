@@ -12,7 +12,7 @@ class FeatureSeeder extends Seeder
      */
     public function run()
     {
-        $features = ['tools', 'projects', 'inspections', 'reparations', 'users'];
+        $features = ['tools', 'projects', 'inspections', 'repairs', 'users'];
         $featuresCount = count($features);
 
         for ($i = 0; $i < $featuresCount; $i++) {

@@ -26,7 +26,7 @@ class ComponentSeeder extends Seeder
                 'feature_id' => 3
             ],
             [
-                'name' => 'ReparationComponent',
+                'name' => 'RepairComponent',
                 'feature_id' => 4
             ],
             [
