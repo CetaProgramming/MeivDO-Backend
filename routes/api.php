@@ -38,6 +38,8 @@ Route::middleware(['auth:sanctum'])->group(function (){
         Route::delete('/tools/category/{id}', 'CategoryToolController@destroy');
         //StatusTool
         Route::get('/tools/status', 'StatusToolController@index');
+        //Tool
+        Route::get('/tools', 'ToolController@index');
     });
     Route::get('/roles','RoleController@index');
     Route::get('/user', 'LoginController@user');
