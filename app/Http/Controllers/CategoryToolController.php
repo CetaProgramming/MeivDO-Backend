@@ -7,6 +7,7 @@ use App\groupTool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CategoryToolController extends Controller
@@ -65,6 +66,22 @@ class CategoryToolController extends Controller
             return response()->json($categoryTool, 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try access update on categoryTool but is not possible!Message error({$exception->getMessage()}");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
+    public function destroy($id)
+    {
+        $Auth =Auth::user();
+        try {
+            $categoryTool= categoryTool::find($id);
+            if (!$categoryTool) {
+                throw new \Exception("CategoryTool with id: {$id} dont exist", 500);
+            }
+            $categoryTool->delete();
+            Log::info("User with email {$Auth->email} deleted categoryTool number {$id}");
+            return response()->json(['message' => 'Deleted'], 200);
+        } catch (Exception $exception) {
+            Log::error("User with email {$Auth->email} try access destroy  on categoryTool but  is not possible!Message error({$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }

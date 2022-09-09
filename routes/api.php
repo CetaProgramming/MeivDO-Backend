@@ -35,6 +35,7 @@ Route::middleware(['auth:sanctum'])->group(function (){
         Route::get('/tools/category', 'CategoryToolController@index');
         Route::post('/tools/category', 'CategoryToolController@store');
         Route::put('/tools/category/{id}', 'CategoryToolController@update');
+        Route::delete('/tools/category/{id}', 'CategoryToolController@destroy');
     });
     Route::get('/roles','RoleController@index');
     Route::get('/user', 'LoginController@user');
