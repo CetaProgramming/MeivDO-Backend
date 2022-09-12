@@ -44,6 +44,6 @@ Route::middleware(['auth:sanctum'])->group(function (){
     Route::get('/roles','RoleController@index');
     Route::get('/user', 'LoginController@user');
     Route::put('/changePassword','UserController@updatePassword');
-
+    Route::put('/changeInfo','UserController@updateInfo');
 });
 
