@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-
+use App\Helpers\ImageUpload;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 class UserController extends Controller
@@ -94,6 +95,30 @@ class UserController extends Controller
             return response()->json($user, 200);
         } catch (\Exception $exception) {
             Log::error("Try access update of users with email {$Auth->email} but not is possible!Message error({$exception->getMessage()}");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
+    public function updateInfo(Request $request)
+    {
+        $Auth=Auth::user();
+
+        try {
+            $user= User::find($Auth->id);
+            $validator = \Validator::make($request->all(),[
+                'name'        => 'required',
+                'email'     => 'required|unique:users,email,'.$user->id,
+                'image'       => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'role_id' => 'required',
+            ]);
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first(), 500);
+            }
+            $user->image=ImageUpload::saveImage($request,"users",$user);
+            $user->update($request->all());
+            Log::info("User with email {$Auth->email} updated their one info successfully");
+            return response()->json($user, 200);
+        } catch (\Exception $exception) {
+            Log::error("Try access update their one info with email {$Auth->email} but not is possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
