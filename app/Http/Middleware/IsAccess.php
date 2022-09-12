@@ -24,10 +24,6 @@ class IsAccess
         $userPermissions=  $Auth->data()->role['permissions'];
         $path = Str::of($request->path())->split('%[/]+%');//Users
         $countUserPermissions=count($userPermissions);
-        if($method=="PUT"&&$path[2]==strval($Auth->id)&&$path[1]=="users"){
-            Log::info("User with email {$Auth->email} enter {$path[1]} successfully");
-            return $next($request);
-        }
         for ($i=0;$i<$countUserPermissions;$i++){
             if($userPermissions[$i]['feature'] == $path[1]){
                 $countUserPermissionsRoutes=count($userPermissions[$i]['routes']);
