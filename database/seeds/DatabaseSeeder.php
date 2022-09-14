@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // $this->call(UserSeeder::class);
-        Storage::deleteDirectory('public/images/users' );
+        Storage::deleteDirectory('public/images' );
         $this->call(RoleSeeder::class);
         $this->call(RouteSeeder::class);
         $this->call(FeatureSeeder::class);

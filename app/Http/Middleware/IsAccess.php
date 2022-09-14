@@ -22,8 +22,8 @@ class IsAccess
         $Auth=Auth::user();
         $method = $request->server('REQUEST_METHOD');
         $userPermissions=  $Auth->data()->role['permissions'];
-        $path = Str::of($request->path())->split('%[/]+%');//Users
-        $countUserPermissions=count($userPermissions);
+        $path = Str::of($request->path())->split('%[/]+%');
+        $countUserPermissions=count($userPermissions);//5
         for ($i=0;$i<$countUserPermissions;$i++){
             if($userPermissions[$i]['feature'] == $path[1]){
                 $countUserPermissionsRoutes=count($userPermissions[$i]['routes']);

@@ -16,6 +16,8 @@ class CreateCategoryToolsTable extends Migration
         Schema::create('category_tools', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->foreignId('user_id') -> constrained();
+            $table->boolean('active');
             $table->timestamps();
             $table->softDeletes();
         });

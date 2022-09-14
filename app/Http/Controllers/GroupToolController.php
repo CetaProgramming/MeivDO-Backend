@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\groupTool;
 use App\User;
+use App\Helpers\ImageUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -35,7 +36,7 @@ class GroupToolController extends Controller
             $validator = \Validator::make($request->all(),[
                 'code'     => 'required|unique:group_tools',
                 'image'       => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'category_tools_id' =>'required|exists:category_tools,id',
+                'category' =>'required|exists:category_tools,id',
                 'description' => 'required',
             ]);
             if ($validator->fails()) {
@@ -43,17 +44,12 @@ class GroupToolController extends Controller
             }
             $groupTool= new groupTool();
             $groupTool->code=$request->code;
-            $groupTool->category_tools_id=$request->category_tools_id;
+            $groupTool->category_tools_id=$request->category;
             $groupTool->description=$request->description;
             $groupTool->active=1;
             $groupTool->user_id=$Auth->id;
             $groupTool->save();
-            if ($request->file('image')) {
-                $imagePath = $request->file('image');
-                $imageName =  Str::of($imagePath->getClientOriginalName())->split('/[\s.]+/');
-                $path = $request->file('image')->storeAs('images/groupTool/' .  $groupTool->id, $groupTool->id."_profile.". $imageName[1], 'public');
-                $groupTool->image=$path;
-            }
+            $request->image && $groupTool->image=ImageUpload::saveImage($request,"group_tools",$groupTool);
             $groupTool->save();
             Log::info("User with email { $Auth->email} created groupTool number { $groupTool->id}");
             return response()->json($groupTool, 201);
@@ -73,21 +69,20 @@ class GroupToolController extends Controller
             }
             $validator = \Validator::make($request->all(),[
                 'code'     => 'required|unique:group_tools,code,'.$groupTool->id,
-                'image'       => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'category_tools_id' =>'required|exists:category_tools,id',
+                'image'       => '|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'category' =>'required|exists:category_tools,id',
+                'active'=>'required|boolean',
                 'description' => 'required',
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-            if ($request->file('image')) {
-                $imagePath = $request->file('image');
-                $imageName =  Str::of($imagePath->getClientOriginalName())->split('/[\s.]+/');
-                $path = $request->file('image')->storeAs('images/groupTool/' . $groupTool->id,$groupTool->id."_profile.". $imageName[1], 'public');
-                $groupTool->image=$path;
-            }
+
+
             $groupTool->user_id=$Auth->id;
             $groupTool->update($request->all());
+            $request->image && $groupTool->image=ImageUpload::saveImage($request,"group_tools",$groupTool);
+            $groupTool->save();
             Log::info("User with email {$Auth->email} updated groupTool number {$id} successfully");
             return response()->json($groupTool, 200);
         } catch (\Exception $exception) {

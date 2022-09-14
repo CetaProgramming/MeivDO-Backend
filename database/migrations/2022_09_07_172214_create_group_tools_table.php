@@ -20,7 +20,7 @@ class CreateGroupToolsTable extends Migration
             $table->foreignId('category_tools_id')->constrained();
             $table->string('description');
             $table->boolean('active');
-            $table->integer('user_id');
+            $table->foreignId('user_id') -> constrained();
             $table->timestamps();
             $table->softDeletes();
         });
