@@ -51,10 +51,10 @@ class UserController extends Controller
             $user->role_id=$request->role_id;
             $user->user_id=$Auth->id;
             $user->save();
-            $user->image=ImageUpload::saveImage($request,"users",$user);
-            $user->save();
+            $request->image && $user->image=ImageUpload::saveImage($request,"users",$user); 
+            $user->save();        
             Log::info("User with email { $Auth->email} created user number {$user->id}");
-            return response()->json($user, 201);
+            return response()->json($user::find($user->id), 201);
         } catch (\Exception $exception) {
             Log::error("User with email { $Auth->email} receive an error on Users( {$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -80,7 +80,7 @@ class UserController extends Controller
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-            $user->image=ImageUpload::saveImage($request,"users",$user);
+            $request->image && $user->image=ImageUpload::saveImage($request,"users",$user);
             $user->user_id=$Auth->id;
             $user->update($request->all());
             Log::info("User with email {$Auth->email} updated user number {$id} successfully");
@@ -180,7 +180,7 @@ class UserController extends Controller
 
 
 
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             Log::error("Try access destroy of users with email {$Auth->email} but not is possible!Message error({$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
