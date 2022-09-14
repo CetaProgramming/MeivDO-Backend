@@ -51,8 +51,8 @@ class UserController extends Controller
             $user->role_id=$request->role_id;
             $user->user_id=$Auth->id;
             $user->save();
-            $request->image && $user->image=ImageUpload::saveImage($request,"users",$user); 
-            $user->save();        
+            $request->image && $user->image=ImageUpload::saveImage($request,"users",$user);
+            $user->save();
             Log::info("User with email { $Auth->email} created user number {$user->id}");
             return response()->json($user::find($user->id), 201);
         } catch (\Exception $exception) {
@@ -74,7 +74,7 @@ class UserController extends Controller
                 'name'        => 'required',
                 'email'     => 'required|unique:users,email,'.$user->id,
                 'image'       => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'active'=>'required',
+                'active'=>'required|boolean',
                 'role_id' => 'required',
             ]);
             if ($validator->fails()) {
@@ -170,6 +170,9 @@ class UserController extends Controller
         $Auth =Auth::user();
         try {
             $user= User::find($id);
+            if($Auth->id ==$id){
+                throw new \Exception("You cant delete user with id: {$id} because its yourself", 500);
+            }
             if (!$user) {
                 throw new \Exception("User with id: {$id} dont exist", 500);
             }
