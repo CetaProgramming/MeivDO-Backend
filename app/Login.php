@@ -15,9 +15,6 @@ class Login extends User
 
     public function data(){
 
-        if(!$this->image)
-            $this->image = '/storage/default/default-profile.png';
-
         $roleData = Role::find($this->role_id);
 
         $this->role = [
