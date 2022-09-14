@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -13,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use App\Helpers\ImageUpload;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+
 class UserController extends Controller
 {
 
@@ -93,19 +93,16 @@ class UserController extends Controller
     public function updateInfo(Request $request)
     {
         $Auth=Auth::user();
-
         try {
             $user= User::find($Auth->id);
             $validator = \Validator::make($request->all(),[
                 'name'        => 'required',
-                'email'     => 'required|unique:users,email,'.$user->id,
-                'image'       => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'role_id' => 'required',
+                $request->image && 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-            $user->image=ImageUpload::saveImage($request,"users",$user);
+            $request->image && $user->image=ImageUpload::saveImage($request,"users",$user);
             $user->user_id=$Auth->id;
             $user->update($request->all());
             Log::info("User with email {$Auth->email} updated their one info successfully");
