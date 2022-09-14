@@ -12,7 +12,7 @@ class ImageUpload
             $imagePath = $request->file('image');
             $imageName =  Str::of($imagePath->getClientOriginalName())->split('/[\s.]+/');
             Storage::deleteDirectory('public/images/'.$dataBaseName.'/'. $row->id);
-            return $request->file('image')->storeAs('images/'.$dataBaseName.'/'. $row->id,$row->id."_profile.". $imageName[1], 'public');
+            return $request->file('image')->storeAs('images/'.$dataBaseName.'/'. $row->id,$row->id."_profile.". $imageName[count($imageName)-1], 'public');
         }
 
 

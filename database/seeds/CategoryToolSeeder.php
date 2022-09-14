@@ -18,6 +18,8 @@ class CategoryToolSeeder extends Seeder
         foreach ($arrayName as $array){
             \DB::table('category_tools')->insert([
                 'name'      => $array ,
+                'active'=>1,
+                'user_id'=>2,
                 'created_at'=> now(),
                 'updated_at' =>now(),
             ]);

@@ -37,6 +37,8 @@ class CategoryToolController extends Controller
                 throw new \Exception($validator->errors()->first(), 500);
             }
             $categoryTool= new categoryTool();
+            $categoryTool->user_id=$Auth->id;
+            $categoryTool->active=1;
             $categoryTool->name=$request->name;
             $categoryTool->save();
             Log::info("User with email { $Auth->email} created categoryTool number { $categoryTool->id}");
@@ -57,10 +59,12 @@ class CategoryToolController extends Controller
             }
             $validator = \Validator::make($request->all(),[
                 'name' => 'required',
+                'active'=>'required|boolean',
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
+            $categoryTool->user_id=$Auth->id;
             $categoryTool->update($request->all());
             Log::info("User with email {$Auth->email} updated categoryTool number {$id} successfully");
             return response()->json($categoryTool, 200);
