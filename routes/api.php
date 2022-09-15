@@ -42,6 +42,7 @@ Route::middleware(['auth:sanctum'])->group(function (){
         Route::get('/tools', 'ToolController@index');
         Route::post('/tools', 'ToolController@store');
         Route::put('/tools/{id}', 'ToolController@update');
+        Route::delete('/tools/{id}', 'ToolController@destroy');
     });
     Route::get('/roles','RoleController@index');
     Route::get('/user', 'LoginController@user');
