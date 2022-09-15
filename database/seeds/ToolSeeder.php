@@ -21,6 +21,7 @@ class ToolSeeder extends Seeder
                 'group_tools_id'=>rand(1,3),
                 'status_tools_id'=>rand(1,3),
                 'user_id'=>rand(1,3),
+                'active'=>1,
                 'created_at'=> now(),
                 'updated_at' =>now(),
             ]);

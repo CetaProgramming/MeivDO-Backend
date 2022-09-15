@@ -19,6 +19,7 @@ class CreateToolsTable extends Migration
             $table->foreignId('group_tools_id') -> constrained();
             $table->foreignId('status_tools_id') -> constrained();
             $table->foreignId('user_id') -> constrained();
+            $table->boolean('active');
             $table->softDeletes();
             $table->timestamps();
         });
