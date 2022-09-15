@@ -26,7 +26,7 @@ class ToolController extends Controller
     public function store(Request $request)
     {
         $Auth=Auth::user();
-        $Tool= new Tool();
+        $tool= new Tool();
         try {
             $validator = \Validator::make($request->all(),[
                 'code'     => 'required|unique:tools',
@@ -36,16 +36,44 @@ class ToolController extends Controller
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-            $Tool->code=$request->code;
-            $Tool->group_tools_id=$request->group_tools_id;
-            $Tool->status_tools_id=$request->status_tools_id;
-            $Tool->active=1;
-            $Tool->user_id=$Auth->id;
-            $Tool->save();
-            Log::info("User with email { $Auth->email} created groupTool number { $Tool->id}");
-            return response()->json($Tool->load(['statusTools','groupTools','user']), 201);
+            $tool->code=$request->code;
+            $tool->group_tools_id=$request->group_tools_id;
+            $tool->status_tools_id=$request->status_tools_id;
+            $tool->active=1;
+            $tool->user_id=$Auth->id;
+            $tool->save();
+            Log::info("User with email { $Auth->email} created groupTool number { $tool->id}");
+            return response()->json($tool->load(['statusTools','groupTools','user']), 201);
         } catch (\Exception $exception) {
             Log::error("User with email { $Auth->email} receive an error on groupTool( {$exception->getMessage()})");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
+    public function update(Request $request,  $id)
+    {
+        $Auth=Auth::user();
+
+        try {
+            $tool= Tool::find($id);
+            if (!$tool) {
+                throw new \Exception("GroupTool with id: {$id} dont exist", 500);
+            }
+            $validator = \Validator::make($request->all(),[
+                'code'     => 'required|unique:tools,code,'.$tool->id,
+                'active'=>'required|boolean',
+                'group_tools_id'       => 'required|exists:group_tools,id',
+                'status_tools_id' =>'required|exists:status_tools,id',
+            ]);
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first(), 500);
+            }
+            $tool->user_id=$Auth->id;
+
+            $tool->update($request->all());
+            Log::info("User with email {$Auth->email} updated groupTool number {$id} successfully");
+            return response()->json($tool->load(['statusTools','groupTools','user']), 200);
+        } catch (\Exception $exception) {
+            Log::error("User with email {$Auth->email} try access update on groupTool but is not possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
