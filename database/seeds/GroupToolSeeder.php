@@ -18,7 +18,6 @@ class GroupToolSeeder extends Seeder
         foreach ($arrayName as $array){
             \DB::table('group_tools')->insert([
                 'code'=> $array,
-                'image'=>null,
                 'category_tools_id'=>rand(1,3),
                 'description'=>'dd',
                 'active'=>1,
