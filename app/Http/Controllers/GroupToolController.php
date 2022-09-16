@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\categoryTool;
 use App\groupTool;
 use App\User;
 use App\Helpers\ImageUpload;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-
+use App\Helpers\Active;
 class GroupToolController extends Controller
 {
 
@@ -21,7 +21,7 @@ class GroupToolController extends Controller
         try {
 
             Log::info("User with email {$Auth->email} get groupTools successfully");
-            return response()->json(GroupTool::with(['categoryTools','user'])->paginate(15), 200);
+            return response()->json(GroupTool::with(['categoryTools','user'])->where('active',1)->paginate(15), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get groupTools but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -45,6 +45,7 @@ class GroupToolController extends Controller
             $groupTool= new groupTool();
             $groupTool->code=$request->code;
             $groupTool->category_tools_id=$request->category;
+            Active::verifyActive(categoryTool::find($request->category));
             $groupTool->description=$request->description;
             $groupTool->active=1;
             $groupTool->user_id=$Auth->id;
@@ -79,6 +80,7 @@ class GroupToolController extends Controller
             }
 
             $groupTool->category_tools_id=$request->category;
+            Active::verifyActive(categoryTool::find($request->category));
             $groupTool->user_id=$Auth->id;
             $groupTool->update($request->all());
             $request->image && $groupTool->image=ImageUpload::saveImage($request,"group_tools",$groupTool);

@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\groupTool;
 use App\Tool;
+use App\Helpers\Active;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +18,7 @@ class ToolController extends Controller
 
         try {
             Log::info("User with email {$Auth->email} get Tools successfully");
-            return response()->json(Tool::with(['statusTools','groupTools','user'])->paginate(15), 200);
+            return response()->json(Tool::with(['statusTools','groupTools','user'])->where('active',1)->paginate(15), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get Tools but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -39,6 +40,7 @@ class ToolController extends Controller
             }
             $tool->code=$request->code;
             $tool->group_tools_id=$request->group_tools_id;
+            Active::verifyActive(groupTool::find($request->group_tools_id));
             $tool->status_tools_id=$request->status_tools_id;
             $tool->active=1;
             $tool->user_id=$Auth->id;
@@ -68,6 +70,7 @@ class ToolController extends Controller
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
+            Active::verifyActive(groupTool::find($request->group_tools_id));
             $tool->user_id=$Auth->id;
 
             $tool->update($request->all());
