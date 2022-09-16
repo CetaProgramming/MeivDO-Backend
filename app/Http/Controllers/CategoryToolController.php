@@ -19,7 +19,7 @@ class CategoryToolController extends Controller
         try {
 
             Log::info("User with email {$Auth->email} get categoryTools successfully");
-            return response()->json(categoryTool::with(['groupTools'])->paginate(15), 200);
+            return response()->json(categoryTool::with(['groupTools','user'])->paginate(15), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get categoryTools but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -42,7 +42,7 @@ class CategoryToolController extends Controller
             $categoryTool->name=$request->name;
             $categoryTool->save();
             Log::info("User with email { $Auth->email} created categoryTool number { $categoryTool->id}");
-            return response()->json($categoryTool, 201);
+            return response()->json($categoryTool->load(['groupTools','user']), 201);
         } catch (\Exception $exception) {
             Log::error("User with email { $Auth->email} receive an error on categoryTool( {$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -67,7 +67,7 @@ class CategoryToolController extends Controller
             $categoryTool->user_id=$Auth->id;
             $categoryTool->update($request->all());
             Log::info("User with email {$Auth->email} updated categoryTool number {$id} successfully");
-            return response()->json($categoryTool, 200);
+            return response()->json($categoryTool->load(['groupTools','user']), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try access update on categoryTool but is not possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());

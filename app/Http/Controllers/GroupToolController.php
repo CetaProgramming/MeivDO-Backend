@@ -21,7 +21,7 @@ class GroupToolController extends Controller
         try {
 
             Log::info("User with email {$Auth->email} get groupTools successfully");
-            return response()->json(GroupTool::with(['categoryTools'])->paginate(15), 200);
+            return response()->json(GroupTool::with(['categoryTools','user'])->paginate(15), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get groupTools but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -35,7 +35,7 @@ class GroupToolController extends Controller
         try {
             $validator = \Validator::make($request->all(),[
                 'code'     => 'required|unique:group_tools',
-                'image'       => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image'       => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'category' =>'required|exists:category_tools,id',
                 'description' => 'required',
             ]);
@@ -52,7 +52,7 @@ class GroupToolController extends Controller
             $request->image && $groupTool->image=ImageUpload::saveImage($request,"group_tools",$groupTool);
             $groupTool->save();
             Log::info("User with email { $Auth->email} created groupTool number { $groupTool->id}");
-            return response()->json($groupTool, 201);
+            return response()->json($groupTool::find($groupTool->id)->load(['categoryTools','user']), 201);
         } catch (\Exception $exception) {
             Log::error("User with email { $Auth->email} receive an error on groupTool( {$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -69,7 +69,7 @@ class GroupToolController extends Controller
             }
             $validator = \Validator::make($request->all(),[
                 'code'     => 'required|unique:group_tools,code,'.$groupTool->id,
-                'image'       => '|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image'       => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'category' =>'required|exists:category_tools,id',
                 'active'=>'required|boolean',
                 'description' => 'required',
@@ -78,13 +78,13 @@ class GroupToolController extends Controller
                 throw new \Exception($validator->errors()->first(), 500);
             }
 
-
+            $groupTool->category_tools_id=$request->category;
             $groupTool->user_id=$Auth->id;
             $groupTool->update($request->all());
             $request->image && $groupTool->image=ImageUpload::saveImage($request,"group_tools",$groupTool);
             $groupTool->save();
             Log::info("User with email {$Auth->email} updated groupTool number {$id} successfully");
-            return response()->json($groupTool, 200);
+            return response()->json($groupTool->load(['categoryTools','user']), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try access update on groupTool but is not possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());

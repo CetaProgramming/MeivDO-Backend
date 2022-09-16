@@ -22,7 +22,7 @@ class UserController extends Controller
         $Auth=Auth::user();
         try {
             Log::info("User with email {$Auth->email} get users successfully");
-            return response()->json(User::paginate(15), 200);
+            return response()->json(User::with(['role'])->paginate(15), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get users but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -38,7 +38,7 @@ class UserController extends Controller
                 'name'        => 'required',
                 'email'     => 'required|unique:users|email:rfc,dns',
                 'image'       => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'role_id' => 'required',
+                'role_id' => 'required|exists:roles,id|integer',
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
@@ -54,7 +54,7 @@ class UserController extends Controller
             $request->image && $user->image=ImageUpload::saveImage($request,"users",$user);
             $user->save();
             Log::info("User with email { $Auth->email} created user number {$user->id}");
-            return response()->json($user::find($user->id), 201);
+            return response()->json($user::find($user->id)->load(['role']), 201);
         } catch (\Exception $exception) {
             Log::error("User with email { $Auth->email} receive an error on Users( {$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -72,10 +72,10 @@ class UserController extends Controller
             }
             $validator = \Validator::make($request->all(),[
                 'name'        => 'required',
-                'email'     => 'required|unique:users,email,'.$user->id,
+                'email'     => 'required|unique:users,email,'.$user->id.'|email:rfc,dns',
                 'image'       => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'active'=>'required|boolean',
-                'role_id' => 'required',
+                'role_id' => 'required|exists:roles,id|integer',
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
@@ -84,7 +84,7 @@ class UserController extends Controller
             $user->user_id=$Auth->id;
             $user->update($request->all());
             Log::info("User with email {$Auth->email} updated user number {$id} successfully");
-            return response()->json($user, 200);
+            return response()->json($user->load(['role']), 200);
         } catch (\Exception $exception) {
             Log::error("Try access update of users with email {$Auth->email} but not is possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -106,7 +106,7 @@ class UserController extends Controller
             $user->user_id=$Auth->id;
             $user->update($request->all());
             Log::info("User with email {$Auth->email} updated their one info successfully");
-            return response()->json($user, 200);
+            return response()->json($user->load(['role']), 200);
         } catch (\Exception $exception) {
             Log::error("Try access update their one info with email {$Auth->email} but not is possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -138,7 +138,7 @@ class UserController extends Controller
             $user->user_id=$Auth->id;
             $user->save();
             Log::info("User with email {$Auth->email} change is password successfully");
-            return response()->json($user, 200);
+            return response()->json($user->load(['role']), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try to change is password but not is possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -159,7 +159,7 @@ class UserController extends Controller
             $user->user_id=$Auth->id;
             $user->save();
             Log::info("User with email {$Auth->email} reset the password of user with id {$id} successfully");
-            return response()->json($user, 200);
+            return response()->json($user->load(['role']), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try to reset the password of user with id {$id} but not is possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
