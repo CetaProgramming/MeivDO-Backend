@@ -16,7 +16,7 @@ class CreateGroupToolsTable extends Migration
         Schema::create('group_tools', function (Blueprint $table) {
             $table->id();
             $table->string('code');
-            $table->string('image')->nullable();
+            $table->string('image')->default('default/default-noimage.png');
             $table->foreignId('category_tools_id')->constrained();
             $table->string('description');
             $table->boolean('active');
