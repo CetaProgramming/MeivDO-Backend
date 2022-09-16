@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Helpers\Active;
+use App\Helpers\IsDeleted;
 class GroupToolController extends Controller
 {
 
@@ -45,6 +46,7 @@ class GroupToolController extends Controller
             $groupTool= new groupTool();
             $groupTool->code=$request->code;
             $groupTool->category_tools_id=$request->category;
+            IsDeleted::verifyDeleted(categoryTool::onlyTrashed()->find($request->category));
             Active::verifyActive(categoryTool::find($request->category));
             $groupTool->description=$request->description;
             $groupTool->active=1;
@@ -80,6 +82,7 @@ class GroupToolController extends Controller
             }
 
             $groupTool->category_tools_id=$request->category;
+            IsDeleted::verifyDeleted(categoryTool::onlyTrashed()->find($request->category));
             Active::verifyActive(categoryTool::find($request->category));
             $groupTool->user_id=$Auth->id;
             $groupTool->update($request->all());
