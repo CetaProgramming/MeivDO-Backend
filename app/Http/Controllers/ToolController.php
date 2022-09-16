@@ -6,6 +6,7 @@ use App\Tool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ToolController extends Controller
 {
@@ -15,10 +16,10 @@ class ToolController extends Controller
         $Auth=Auth::user();
 
         try {
-            Log::info("User with email {$Auth->email} get groupTools successfully");
+            Log::info("User with email {$Auth->email} get Tools successfully");
             return response()->json(Tool::with(['statusTools','groupTools','user'])->paginate(15), 200);
         } catch (\Exception $exception) {
-            Log::error("User with email {$Auth->email} try get groupTools but not successfully!");
+            Log::error("User with email {$Auth->email} try get Tools but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
 
         }
@@ -42,10 +43,10 @@ class ToolController extends Controller
             $tool->active=1;
             $tool->user_id=$Auth->id;
             $tool->save();
-            Log::info("User with email { $Auth->email} created groupTool number { $tool->id}");
+            Log::info("User with email { $Auth->email} created Tool number { $tool->id}");
             return response()->json($tool->load(['statusTools','groupTools','user']), 201);
         } catch (\Exception $exception) {
-            Log::error("User with email { $Auth->email} receive an error on groupTool( {$exception->getMessage()})");
+            Log::error("User with email { $Auth->email} receive an error on Tool( {$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
@@ -56,7 +57,7 @@ class ToolController extends Controller
         try {
             $tool= Tool::find($id);
             if (!$tool) {
-                throw new \Exception("GroupTool with id: {$id} dont exist", 500);
+                throw new \Exception("Tool with id: {$id} dont exist", 500);
             }
             $validator = \Validator::make($request->all(),[
                 'code'     => 'required|unique:tools,code,'.$tool->id,
@@ -70,10 +71,26 @@ class ToolController extends Controller
             $tool->user_id=$Auth->id;
 
             $tool->update($request->all());
-            Log::info("User with email {$Auth->email} updated groupTool number {$id} successfully");
+            Log::info("User with email {$Auth->email} updated Tool number {$id} successfully");
             return response()->json($tool->load(['statusTools','groupTools','user']), 200);
         } catch (\Exception $exception) {
-            Log::error("User with email {$Auth->email} try access update on groupTool but is not possible!Message error({$exception->getMessage()}");
+            Log::error("User with email {$Auth->email} try access update on Tool but is not possible!Message error({$exception->getMessage()}");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
+    public function destroy($id)
+    {
+        $Auth =Auth::user();
+        try {
+            $tool= Tool::find($id);
+            if (! $tool) {
+                throw new \Exception("Tool with id: {$id} dont exist", 500);
+            }
+            $tool->delete();
+            Log::info("User with email {$Auth->email} deleted Tool number {$id}");
+            return response()->json(['message' => 'Deleted'], 200);
+        } catch (Exception $exception) {
+            Log::error("User with email {$Auth->email} try access destroy  on Tool but  is not possible!Message error({$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
