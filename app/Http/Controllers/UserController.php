@@ -22,7 +22,7 @@ class UserController extends Controller
         $Auth=Auth::user();
         try {
             Log::info("User with email {$Auth->email} get users successfully");
-            return response()->json(User::with(['role'])->paginate(15), 200);
+            return response()->json(User::with(['role'])->where('active',1)->paginate(15), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get users but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\categoryTool;
-use App\groupTool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -19,7 +18,7 @@ class CategoryToolController extends Controller
         try {
 
             Log::info("User with email {$Auth->email} get categoryTools successfully");
-            return response()->json(categoryTool::with(['groupTools','user'])->paginate(15), 200);
+            return response()->json(categoryTool::with(['groupTools','user'])->where('active',1)->paginate(15), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get categoryTools but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
