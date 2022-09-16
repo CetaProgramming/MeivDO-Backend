@@ -14,6 +14,23 @@ class User extends Authenticatable
     public function role(){
         return $this->belongsTo('App\role');
     }
+    public function groupTools(){
+        return $this->hasMany('App\groupTool','category_tools_id','id');
+    }
+    public function categoryTools(){
+        return $this->hasMany('App\categoryTool');
+    }
+    public function tools(){
+        return $this->hasMany('App\tool');
+    }
+    protected static function booted()
+    {
+        static::deleting(function ($goalType) {
+            if ($goalType->groupTools()->exists() ||$goalType->categoryTools()->exists()||$goalType->tools()->exists()) {
+                throw new \Exception("The user have relations", 500);
+            }
+        });
+    }
     /**
      * The attributes that are mass assignable.
      *

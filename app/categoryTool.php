@@ -16,4 +16,12 @@ class categoryTool extends Model
     public function user(){
         return $this->belongsTo('App\user');
     }
+    protected static function booted()
+    {
+        static::deleting(function ($goalType) {
+            if ($goalType->groupTools()->exists()) {
+                throw new \Exception("The category have relations", 500);
+            }
+        });
+    }
 }

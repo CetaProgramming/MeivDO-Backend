@@ -18,5 +18,13 @@ class Tool extends Model
     public function  user(){
         return $this->belongsTo('App\user');
     }
+    protected static function booted()
+    {
+        static::deleting(function ($goalType) {
+            if ($goalType->groupTools()->exists() ||$goalType->categoryTools()->exists()||$goalType->tools()->exists()) {
+                throw new \Exception("The tool have relations", 500);
+            }
+        });
+    }
 }
 
