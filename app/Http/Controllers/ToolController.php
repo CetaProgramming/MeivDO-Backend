@@ -19,7 +19,7 @@ class ToolController extends Controller
 
         try {
             Log::info("User with email {$Auth->email} get Tools successfully");
-            return response()->json(Tool::with(['statusTools','groupTools','user'])->where('active',1)->paginate(15), 200);
+            return response()->json(Tool::with(['statusTools','groupTools','user'])->paginate(15), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get Tools but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());

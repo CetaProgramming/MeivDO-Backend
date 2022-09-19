@@ -22,7 +22,7 @@ class GroupToolController extends Controller
         try {
 
             Log::info("User with email {$Auth->email} get groupTools successfully");
-            return response()->json(GroupTool::with(['categoryTools','user'])->where('active',1)->paginate(15), 200);
+            return response()->json(GroupTool::with(['categoryTools','user'])->paginate(15), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get groupTools but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
