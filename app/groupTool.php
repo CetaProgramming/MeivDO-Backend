@@ -15,7 +15,7 @@ class groupTool extends Model
         return $this->belongsTo('App\categoryTool');
     }
     public function user(){
-        return $this->belongsTo('App\user');
+        return $this->belongsTo('App\User');
     }
 
 }

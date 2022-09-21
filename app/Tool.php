@@ -10,13 +10,13 @@ class Tool extends Model
     use SoftDeletes;
     protected $fillable = ['code','active','group_tools_id','status_tools_id'];
     public function statusTools(){
-        return $this->belongsTo('App\statusTool');
+        return $this->belongsTo('App\StatusTool');
     }
     public function groupTools(){
         return  $this->belongsTo('App\groupTool');
     }
     public function  user(){
-        return $this->belongsTo('App\user');
+        return $this->belongsTo('App\User');
     }
     protected static function booted()
     {
