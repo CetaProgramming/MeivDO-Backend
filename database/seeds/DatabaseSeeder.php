@@ -23,5 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call(GroupToolSeeder::class);
         $this->call(StatusToolSeeder::class);
         $this->call(ToolSeeder::class);
+        $this->call(ProjectSeeder::class);
+        $this->call(ProjectToolSeeder::class);
     }
 }
