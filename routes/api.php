@@ -47,6 +47,7 @@ Route::middleware(['auth:sanctum'])->group(function (){
         Route::delete('/tools/{id}', 'ToolController@destroy');
         //Project
         Route::get('/projects', 'ProjectController@index');
+        Route::delete('/projects/{id}', 'ProjectController@destroy');
     });
     Route::get('/user', 'LoginController@user');
     Route::put('/changePassword','UserController@updatePassword');

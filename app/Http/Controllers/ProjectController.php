@@ -23,4 +23,21 @@ class ProjectController extends Controller
 
         }
     }
+    public function destroy($id)
+    {
+        $Auth =Auth::user();
+        try {
+            $project= project::find($id);
+            if (!$project) {
+                throw new \Exception("Project with id: {$id} dont exist", 500);
+            }
+            $project->delete();
+            Log::info("User with email {$Auth->email} deleted project Tool number {$id}");
+            return response()->json(['message' => 'Deleted'], 200);
+        } catch (Exception $exception) {
+            Log::error("User with email {$Auth->email} try access destroy  on project but  is not possible!Message error({$exception->getMessage()})");
+            return response()->json(['error' => $exception->getMessage()->errors()->first()], $exception->getCode());
+        }
+    }
 }
+
