@@ -26,6 +26,8 @@ Route::middleware(['auth:sanctum'])->group(function (){
         Route::put('/users/resetPassword/{id}','UserController@resetPassword');
         Route::get('/users', 'UserController@index');
         Route::delete('/users/{id}', 'UserController@destroy');
+        Route::get('/users/roles','RoleController@index');
+
         //GroupTools
         Route::get('/tools/groups', 'GroupToolController@index');
         Route::post('/tools/groups', 'GroupToolController@store');
@@ -44,7 +46,6 @@ Route::middleware(['auth:sanctum'])->group(function (){
         Route::put('/tools/{id}', 'ToolController@update');
         Route::delete('/tools/{id}', 'ToolController@destroy');
     });
-    Route::get('/roles','RoleController@index');
     Route::get('/user', 'LoginController@user');
     Route::put('/changePassword','UserController@updatePassword');
     Route::put('/changeInfo','UserController@updateInfo');
