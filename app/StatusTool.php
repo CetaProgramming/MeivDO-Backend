@@ -9,7 +9,7 @@ class StatusTool extends Model
 {
 
     public function tools(){
-       return  $this->hasMany('App\tool','status_tools_id','id');
+       return  $this->hasMany('App\Tool','status_tools_id','id');
     }
 
     use SoftDeletes;

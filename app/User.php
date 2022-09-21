@@ -12,7 +12,7 @@ class User extends Authenticatable
     use Notifiable;
 
     public function role(){
-        return $this->belongsTo('App\role');
+        return $this->belongsTo('App\Role');
     }
     public function groupTools(){
         return $this->hasMany('App\groupTool','category_tools_id','id');
@@ -21,7 +21,7 @@ class User extends Authenticatable
         return $this->hasMany('App\categoryTool');
     }
     public function tools(){
-        return $this->hasMany('App\tool');
+        return $this->hasMany('App\Tool');
     }
     protected static function booted()
     {

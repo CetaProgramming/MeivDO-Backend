@@ -14,7 +14,7 @@ class categoryTool extends Model
         return $this->hasMany('App\groupTool','category_tools_id','id');
     }
     public function user(){
-        return $this->belongsTo('App\user');
+        return $this->belongsTo('App\User');
     }
     protected static function booted()
     {
