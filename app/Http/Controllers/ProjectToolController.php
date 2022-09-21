@@ -9,6 +9,29 @@ use Illuminate\Support\Facades\Log;
 
 class ProjectToolController extends Controller
 {
+    public function store(Request $request)
+    {
+        $Auth=Auth::user();
+        try {
+            $validator = \Validator::make($request->all(),[
+                'tool_id' => 'required|unique:tools,id',
+                'project_id' => 'required|unique:projects,id',
+            ]);
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first(), 500);
+            }
+            $project= new project();
+            $project->user_id=$Auth->id;
+            $project->tool_id=$request->tool_id;
+            $project->project_id=$request->project_id;
+            $project->save();
+            Log::info("User with email { $Auth->email} created project tool number { $project->id}");
+            return response()->json($project->load(['tool','project']), 201);
+        } catch (\Exception $exception) {
+            Log::error("User with email { $Auth->email} receive an error on project tool( {$exception->getMessage()})");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
     public function destroy($id)
     {
         $Auth =Auth::user();
