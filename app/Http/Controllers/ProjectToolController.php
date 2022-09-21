@@ -4,82 +4,25 @@ namespace App\Http\Controllers;
 
 use App\ProjectTool;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ProjectToolController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\ProjectTool  $projectTool
-     * @return \Illuminate\Http\Response
-     */
-    public function show(ProjectTool $projectTool)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\ProjectTool  $projectTool
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(ProjectTool $projectTool)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\ProjectTool  $projectTool
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, ProjectTool $projectTool)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\ProjectTool  $projectTool
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(ProjectTool $projectTool)
-    {
-        //
+        $Auth =Auth::user();
+        try {
+            $projectTool= projectTool::find($id);
+            if (!$projectTool) {
+                throw new \Exception("Project with id: {$id} dont exist", 500);
+            }
+            $projectTool->delete();
+            Log::info("User with email {$Auth->email} deleted project tool number {$id}");
+            return response()->json(['message' => 'Deleted'], 200);
+        } catch (Exception $exception) {
+            Log::error("User with email {$Auth->email} try access destroy  on project tool but  is not possible!Message error({$exception->getMessage()})");
+            return response()->json(['error' => $exception->getMessage()->errors()->first()], $exception->getCode());
+        }
     }
 }

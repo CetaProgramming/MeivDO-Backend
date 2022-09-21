@@ -23,10 +23,16 @@ class User extends Authenticatable
     public function tools(){
         return $this->hasMany('App\Tool');
     }
+    public function project(){
+        return $this->hasMany('App\Project');
+    }
+    public function projectTools(){
+        return $this->hasMany('App\ProjectTool');
+    }
     protected static function booted()
     {
         static::deleting(function ($goalType) {
-            if ($goalType->groupTools()->exists() ||$goalType->categoryTools()->exists()||$goalType->tools()->exists()) {
+            if ($goalType->groupTools()->exists() ||$goalType->categoryTools()->exists()||$goalType->tools()->exists()||$goalType->Project()->exists()||$goalType->ProjectTools()->exists()) {
                 throw new \Exception("The user have relations", 500);
             }
         });
