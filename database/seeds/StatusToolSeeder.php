@@ -12,7 +12,7 @@ class StatusToolSeeder extends Seeder
     public function run()
     {
         $arrayName= array(
-            'PorArranjar','Disponível','Estragado'
+            'Por Reparar','Disponível','Em Obra','Por inspecionar'
         );
 
         foreach ($arrayName as $array){
