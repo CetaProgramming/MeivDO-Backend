@@ -18,6 +18,9 @@ class Tool extends Model
     public function  user(){
         return $this->belongsTo('App\User');
     }
+    public function  projectTools(){
+        return $this->hasMany('App\ProjectTool');
+    }
     protected static function booted()
     {
         static::deleting(function ($goalType) {
