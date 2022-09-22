@@ -13,7 +13,7 @@ class ProjectTool extends Model
         return $this->belongsTo('App\Tool');
     }
     public function project(){
-        return $this->hasOne('App\Project');
+        return $this->belongsTo('App\Project');
     }
     public function user(){
         return $this->belongsTo('App\User');
@@ -26,6 +26,11 @@ class ProjectTool extends Model
             }
         });
         static::creating(function ($goalType) {
+            if (self::where('tool_id', $goalType->tool_id)->where('project_id', $goalType->project_id)->exists()) {
+                throw new \Exception("The project tools id has duplications", 500);
+            }
+        });
+        static::updating(function ($goalType) {
             if (self::where('tool_id', $goalType->tool_id)->where('project_id', $goalType->project_id)->exists()) {
                 throw new \Exception("The project tools id has duplications", 500);
             }
