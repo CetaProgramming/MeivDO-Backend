@@ -46,7 +46,7 @@ class UserController extends Controller
             $user= new User();
             $user->name=$request->name;
             $user->email=$request->email;
-            $user->password= bcrypt($user->name.'123');
+            $user->password= bcrypt('12345');
             $user->active=1;
             $user->role_id=$request->role_id;
             $user->user_id=$Auth->id;
@@ -154,7 +154,8 @@ class UserController extends Controller
                 if (!$user) {
                     throw new \Exception("User with id: {$id} dont exist", 500);
                 }
-            $user->password =bcrypt($user->name.'123');
+
+            $user->password =bcrypt('12345');
             $user->validate=0;
             $user->user_id=$Auth->id;
             $user->save();
