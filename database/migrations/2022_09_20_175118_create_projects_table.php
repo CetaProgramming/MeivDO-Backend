@@ -20,7 +20,6 @@ class CreateProjectsTable extends Migration
             $table->boolean('status');
             $table->date('startDate');
             $table->date('endDate');
-            $table->boolean('active');
             $table->foreignId('user_id') -> constrained();
             $table->softDeletes();
             $table->timestamps();
