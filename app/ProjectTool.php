@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProjectTool extends Model
 {
-    // protected $fillable = ['name','active'];
+     protected $fillable = ['tool_id','project_id','user_id'];
     use SoftDeletes;
     public function tool(){
         return $this->belongsTo('App\Tool');
@@ -23,6 +23,11 @@ class ProjectTool extends Model
         static::deleting(function ($goalType) {
             if ($goalType->tool()->exists()||$goalType->project()->exists()) {
                 throw new \Exception("The project tools have relations", 500);
+            }
+        });
+        static::creating(function ($goalType) {
+            if (self::where('tool_id', $goalType->tool_id)->where('project_id', $goalType->project_id)->exists()) {
+                throw new \Exception("The project tools id has duplications", 500);
             }
         });
     }

@@ -22,7 +22,6 @@ class ProjectSeeder extends Seeder
                 'status'=>1,
                 'startDate'=>date('2003/09/02'),
                 'endDate'=>date('2003/09/02'),
-                'active'=>1,
                 'user_id'=>2,
                 'created_at'=> now(),
                 'updated_at' =>now(),

@@ -14,19 +14,20 @@ class ProjectToolController extends Controller
         $Auth=Auth::user();
         try {
             $validator = \Validator::make($request->all(),[
-                'tool_id' => 'required|unique:tools,id',
-                'project_id' => 'required|unique:projects,id',
+                'tool_id' => 'required|exists:tools,id',
+                'project_id' => 'required|exists:projects,id',
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-            $project= new project();
+            $project= new ProjectTool();
             $project->user_id=$Auth->id;
             $project->tool_id=$request->tool_id;
             $project->project_id=$request->project_id;
             $project->save();
-            Log::info("User with email { $Auth->email} created project tool number { $project->id}");
-            return response()->json($project->load(['tool','project']), 201);
+
+           // Log::info("User with email { $Auth->email} created project tool number");
+            return response()->json($project, 201);
         } catch (\Exception $exception) {
             Log::error("User with email { $Auth->email} receive an error on project tool( {$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
