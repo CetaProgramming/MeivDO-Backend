@@ -37,8 +37,6 @@ class IsAccess
         }
         Log::error("User with email {$Auth->email} try enter {$path[1]}  but not successfully!");
         return response()->json(['error' =>"Forbidden access" ], 403);
-
-
     }
 }
 
