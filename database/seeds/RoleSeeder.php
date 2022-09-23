@@ -13,13 +13,14 @@ class RoleSeeder extends Seeder
     public function run()
     {
 
-        $roles = ['administrator', 'manager', 'operator'];
+        $roles = ['Administrator', 'Manager', 'Operator'];
         $roleCount = count($roles);
 
         for ($i = 0; $i < $roleCount; $i++) {
             Role::insert([
                 'name' => $roles[$i],
-                'created_at' => now()
+                'created_at' => now(),
+                'updated_at' =>now(),
             ]);
         }
     }

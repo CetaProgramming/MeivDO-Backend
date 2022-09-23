@@ -18,7 +18,8 @@ class RouteSeeder extends Seeder
         for($i = 0; $i < $routeCount; $i++){
             Route::insert([
                'name' => $routes[$i],
-               'created_at' => now()
+               'created_at' => now(),
+                'updated_at' =>now(),
             ]);
         }
     }
