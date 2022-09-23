@@ -18,7 +18,8 @@ class FeatureSeeder extends Seeder
         for ($i = 0; $i < $featuresCount; $i++) {
             Feature::insert([
                 'name' => $features[$i],
-                'created_at' => now()
+                'created_at'=> now(),
+                'updated_at' =>now(),
             ]);
         }
 

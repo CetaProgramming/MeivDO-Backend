@@ -42,9 +42,10 @@ class UserSeeder extends Seeder
                 'password' => $users[$i]['password'],
                 'active' => 1,
                 'role_id' => $users[$i]['role_id'],
-                'created_at' => now()
+                'created_at' => now(),
+                'updated_at' =>now(),
             ]);
         }
-        
+
     }
 }

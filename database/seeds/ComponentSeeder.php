@@ -40,7 +40,8 @@ class ComponentSeeder extends Seeder
             Component::insert([
                 'name' => $components[$i]['name'],
                 'feature_id' => $components[$i]['feature_id'],
-                'created_at' => now()
+                'created_at'=> now(),
+                'updated_at' =>now(),
             ]);
         }
     }

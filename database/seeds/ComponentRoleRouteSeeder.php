@@ -87,8 +87,8 @@ class ComponentRoleRouteSeeder extends Seeder
                 'component_id' => 4
             ]
 
-            
-            
+
+
         ];
 
         $componentsRoleRouteCount = count($componentsRoleRoute);
@@ -100,7 +100,8 @@ class ComponentRoleRouteSeeder extends Seeder
                     'role_id' => $componentsRoleRoute[$i]['role_id'],
                     'route_id' => $componentsRoleRoute[$i]['route_id'][$j],
                     'component_id' => $componentsRoleRoute[$i]['component_id'],
-                    'created_at' => now()
+                    'created_at'=> now(),
+                    'updated_at' =>now(),
                 ]);
             }
         }
