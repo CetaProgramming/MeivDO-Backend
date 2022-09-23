@@ -14,8 +14,8 @@ class ProjectToolController extends Controller
         $Auth=Auth::user();
         try {
             $validator = \Validator::make($request->all(),[
-                'tool_id' => 'required|exists:tools,id',
-                'project_id' => 'required|exists:projects,id',
+                'tool_id' => 'required|exists:tools,id,deleted_at,NULL,active,1',
+                'project_id' => 'required|exists:projects,id,deleted_at,NULL,status,1',
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);

@@ -24,7 +24,7 @@ class Tool extends Model
     protected static function booted()
     {
         static::deleting(function ($goalType) {
-            if ($goalType->groupTools()->exists() ||$goalType->categoryTools()->exists()||$goalType->tools()->exists()) {
+            if ($goalType->projectTools()->exists()) {
                 throw new \Exception("The tool have relations", 500);
             }
         });

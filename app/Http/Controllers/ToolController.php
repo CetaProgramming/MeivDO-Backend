@@ -32,9 +32,9 @@ class ToolController extends Controller
         $tool= new Tool();
         try {
             $validator = \Validator::make($request->all(),[
-                'code'     => 'required|unique:tools',
-                'group_tools_id'       => 'required|exists:group_tools,id',
-                'status_tools_id' =>'required|exists:status_tools,id',
+                'code'     => 'required|unique:tools,code,null,id,deleted_at,NULL',
+                'group_tools_id'       => 'required|exists:group_tools,id,deleted_at,NULL,active,1',
+                'status_tools_id' =>'required|exists:status_tools,id,deleted_at,NULL',
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
@@ -64,10 +64,10 @@ class ToolController extends Controller
                 throw new \Exception("Tool with id: {$id} dont exist", 500);
             }
             $validator = \Validator::make($request->all(),[
-                'code'     => 'required|unique:tools,code,'.$tool->id,
+                'code'     => 'required|unique:tools,code,'.$tool->id.',id,deleted_at,NULL',
                 'active'=>'required|boolean',
-                'group_tools_id'       => 'required|exists:group_tools,id',
-                'status_tools_id' =>'required|exists:status_tools,id',
+                'group_tools_id'       => 'required|exists:group_tools,id,deleted_at,NULL,active,1',
+                'status_tools_id' =>'required|exists:status_tools,id,deleted_at,NULL',
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);

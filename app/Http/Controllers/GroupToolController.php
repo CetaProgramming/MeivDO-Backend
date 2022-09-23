@@ -35,9 +35,9 @@ class GroupToolController extends Controller
           $Auth=Auth::user();
         try {
             $validator = \Validator::make($request->all(),[
-                'code'     => 'required|unique:group_tools',
+                'code'     => 'required|unique:group_tools,code,null,id,deleted_at,NULL',
                 'image'       => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'category' =>'required|exists:category_tools,id',
+                'category' =>'required|exists:category_tools,id,deleted_at,NULL,active,1',
                 'description' => 'required',
             ]);
             if ($validator->fails()) {
@@ -46,8 +46,6 @@ class GroupToolController extends Controller
             $groupTool= new groupTool();
             $groupTool->code=$request->code;
             $groupTool->category_tools_id=$request->category;
-            IsDeleted::verifyDeleted(categoryTool::onlyTrashed()->find($request->category));
-            Active::verifyActive(categoryTool::find($request->category));
             $groupTool->description=$request->description;
             $groupTool->active=1;
             $groupTool->user_id=$Auth->id;
@@ -71,9 +69,9 @@ class GroupToolController extends Controller
                 throw new \Exception("GroupTool with id: {$id} dont exist", 500);
             }
             $validator = \Validator::make($request->all(),[
-                'code'     => 'required|unique:group_tools,code,'.$groupTool->id,
+                'code'     => 'required|unique:group_tools,code,'.$groupTool->id.',id,deleted_at,NULL',
                 'image'       => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'category' =>'required|exists:category_tools,id',
+                'category' =>'required|exists:category_tools,id,deleted_at,NULL,active,1',
                 'active'=>'required|boolean',
                 'description' => 'required',
             ]);
@@ -82,8 +80,6 @@ class GroupToolController extends Controller
             }
 
             $groupTool->category_tools_id=$request->category;
-            IsDeleted::verifyDeleted(categoryTool::onlyTrashed()->find($request->category));
-            Active::verifyActive(categoryTool::find($request->category));
             $groupTool->user_id=$Auth->id;
             $groupTool->update($request->all());
             $request->image && $groupTool->image=ImageUpload::saveImage($request,"group_tools",$groupTool);
