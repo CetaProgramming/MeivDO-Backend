@@ -36,7 +36,7 @@ class UserController extends Controller
         try {
             $validator = \Validator::make($request->all(),[
                 'name'        => 'required',
-                'email'     => 'required|unique:users|email:rfc,dns',
+                'email'     => 'required|unique:users,email,null,id,deleted_at,NULL|email:rfc,dns',
                 'image'       => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'role_id' => 'required|exists:roles,id|integer',
             ]);
@@ -72,7 +72,7 @@ class UserController extends Controller
             }
             $validator = \Validator::make($request->all(),[
                 'name'        => 'required',
-                'email'     => 'required|unique:users,email,'.$user->id.'|email:rfc,dns',
+                'email'     => 'required|unique:users,email,'.$user->id.',id,deleted_at,NULL|email:rfc,dns',
                 'image'       => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'active'=>'required|boolean',
                 'role_id' => 'required|exists:roles,id|integer',

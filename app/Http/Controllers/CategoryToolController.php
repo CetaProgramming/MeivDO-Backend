@@ -30,7 +30,7 @@ class CategoryToolController extends Controller
         $Auth=Auth::user();
         try {
             $validator = \Validator::make($request->all(),[
-                'name' => 'required|unique:category_tools',
+                'name' => 'required|unique:category_tools,name,null,id,deleted_at,NULL',
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
@@ -57,7 +57,7 @@ class CategoryToolController extends Controller
                 throw new \Exception("CategoryTool with id: {$id} dont exist", 500);
             }
             $validator = \Validator::make($request->all(),[
-                'name' => 'required|unique:category_tools,name,'.$categoryTool->id,
+                'name' => 'required|unique:category_tools,name,'.$categoryTool->id.',id,deleted_at,NULL',
                 'active'=>'required|boolean',
             ]);
             if ($validator->fails()) {

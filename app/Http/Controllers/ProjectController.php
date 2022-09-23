@@ -28,7 +28,7 @@ class ProjectController extends Controller
         $Auth=Auth::user();
         try {
             $validator = \Validator::make($request->all(),[
-                'name' => 'required|unique:projects',
+                'name' => 'required|unique:projects,name,null,id,deleted_at,NULL',
                 'address' => 'required',
                 'status' => 'required|boolean',
                 'startDate' => 'required|date_format:Y/m/d|after_or_equal:today',
