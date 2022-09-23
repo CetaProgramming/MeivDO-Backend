@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
 {
-   // protected $fillable = ['name','active'];
+    protected $fillable = ['name','address','status','startDate','endDate'];
     use SoftDeletes;
     public function projectTools(){
         return $this->hasMany('App\ProjectTool');
