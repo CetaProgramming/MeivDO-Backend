@@ -53,6 +53,33 @@ class ProjectController extends Controller
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
+    public function update(Request $request,  $id)
+    {
+        $Auth=Auth::user();
+
+      try {
+        $project= project::find($id);
+         if (!$project) {
+             throw new \Exception("Project  with id: {$id} dont exist", 500);
+          }
+          $validator = \Validator::make($request->all(),[
+              'name' => 'required|unique:projects,name,'.$project->id.',id,deleted_at,NULL',
+              'address' => 'required',
+              'status' => 'required|boolean',
+              'startDate' => 'required|date_format:Y/m/d|after_or_equal:today',
+              'endDate' => 'required|date_format:Y/m/d|after_or_equal:startDate',
+         ]);
+         if ($validator->fails()) {
+              throw new \Exception($validator->errors()->first(), 500);
+          }
+         $project->update($request->all());
+         Log::info("User with email {$Auth->email} updated project  number {$id} successfully");
+          return response()->json($project->load(['projectTools','user']), 200);
+      } catch (\Exception $exception) {
+        Log::error("User with email {$Auth->email} try access update on  project but is not possible!Message error({$exception->getMessage()}");
+          return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+       }
+     }
     public function destroy($id)
     {
         $Auth =Auth::user();
