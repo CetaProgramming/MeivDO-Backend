@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\ProjectTool;
+use App\Tool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +15,7 @@ class ProjectToolController extends Controller
         $Auth=Auth::user();
         try {
             $validator = \Validator::make($request->all(),[
-                'tool_id' => 'required|exists:tools,id,deleted_at,NULL,active,1',
+                'tool_id' => 'required|exists:tools,id,deleted_at,NULL,active,1,status_tools_id,2',
                 'project_id' => 'required|exists:projects,id,deleted_at,NULL,status,1',
             ]);
             if ($validator->fails()) {
@@ -23,9 +24,11 @@ class ProjectToolController extends Controller
             $project= new ProjectTool();
             $project->user_id=$Auth->id;
             $project->tool_id=$request->tool_id;
+            $tool=Tool::find($project->tool_id);
+            $tool->status_tools_id=3;
             $project->project_id=$request->project_id;
             $project->save();
-
+            $tool->save();
             Log::info("User with email { $Auth->email} created project tool number");
             return response()->json($project->load(['user','tool','project']), 201);
         } catch (\Exception $exception) {
@@ -67,6 +70,8 @@ class ProjectToolController extends Controller
             if (!$projectTool) {
                 throw new \Exception("Project with id: {$id} dont exist", 500);
             }
+            $projectTool->tool->status_tools_id=4;
+//dd($projectTool->tool);
             $projectTool->delete();
             Log::info("User with email {$Auth->email} deleted project tool number {$id}");
             return response()->json(['message' => 'Deleted'], 200);
