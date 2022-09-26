@@ -71,7 +71,7 @@ class ProjectToolController extends Controller
                 throw new \Exception("Project with id: {$id} dont exist", 500);
             }
             $projectTool->tool->status_tools_id=4;
-//dd($projectTool->tool);
+            $projectTool->tool->save();
             $projectTool->delete();
             Log::info("User with email {$Auth->email} deleted project tool number {$id}");
             return response()->json(['message' => 'Deleted'], 200);

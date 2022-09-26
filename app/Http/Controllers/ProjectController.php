@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Project;
+use App\ProjectTool;
+use App\Tool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -72,7 +74,14 @@ class ProjectController extends Controller
          if ($validator->fails()) {
               throw new \Exception($validator->errors()->first(), 500);
           }
+          if($project->status==0){
+              foreach ($project->projectTools()->get() as $projectTool){
+                  $projectTool->tool->status_tools_id=4;
+                  $projectTool->tool->save();
+              }
+          }
          $project->update($request->all());
+
          Log::info("User with email {$Auth->email} updated project  number {$id} successfully");
           return response()->json($project->load(['projectTools','user']), 200);
       } catch (\Exception $exception) {
@@ -87,6 +96,12 @@ class ProjectController extends Controller
             $project= project::find($id);
             if (!$project) {
                 throw new \Exception("Project with id: {$id} dont exist", 500);
+            }
+            if($project->status==1) {
+                foreach ($project->projectTools()->get() as $projectTool) {
+                    $projectTool->tool->status_tools_id = 4;
+                    $projectTool->tool->save();
+                }
             }
             $project->delete();
             Log::info("User with email {$Auth->email} deleted project number {$id}");

@@ -18,8 +18,8 @@ class Project extends Model
     protected static function booted()
     {
         static::deleting(function ($goalType) {
-            if ($goalType->projectTools()->exists()) {
-                throw new \Exception("The project have relations", 500);
+            if ($goalType->status ==0) {
+                throw new \Exception("The project is close", 500);
             }
         });
     }
