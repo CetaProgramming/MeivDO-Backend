@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-<<<<<<< HEAD
-      <module fileurl="file://$PROJECT_DIR$/.idea/ProjetoBackend.iml" filepath="$PROJECT_DIR$/.idea/ProjetoBackend.iml" />
-=======
-      <module fileurl="file://$PROJECT_DIR$/.idea/MeivDO-Backend.iml" filepath="$PROJECT_DIR$/.idea/MeivDO-Backend.iml" />
->>>>>>> bac69dfa26a3707fda7f0bfb8ec88094be5f2cfe
+      <module fileurl="file://$PROJECT_DIR$/.idea/BackendApi.iml" filepath="$PROJECT_DIR$/.idea/BackendApi.iml" />
     </modules>
   </component>
 </project>

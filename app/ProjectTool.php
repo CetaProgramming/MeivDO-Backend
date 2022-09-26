@@ -21,8 +21,9 @@ class ProjectTool extends Model
     protected static function booted()
     {
         static::deleting(function ($goalType) {
-            if ($goalType->tool()->exists()||$goalType->project()->exists()) {
-                throw new \Exception("The project tools have relations", 500);
+
+            if ($goalType->project->status==0) {
+                throw new \Exception("The project tool is close", 500);
             }
         });
         static::creating(function ($goalType) {
