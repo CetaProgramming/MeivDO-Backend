@@ -37,9 +37,8 @@ class UserController extends Controller
         try {
             Log::info("User with email { $Auth->email} made a search on table users");
             return response()->json(User::where("email", "LIKE", "%{$request->name}%")
+            ->where("active", "LIKE", "%{$request->active}%")
             ->orWhere("name", "LIKE", "%{$request->name}%")
-            ->orWhere("active", "LIKE", "%{$request->name}%")
-            
             ->with(['role'])->paginate(), 200);
         } catch (\Exception $exception) {
             Log::error("User with email { $Auth->email} receive an error on search users( {$exception->getMessage()})");
