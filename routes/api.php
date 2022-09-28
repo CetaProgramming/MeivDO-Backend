@@ -31,6 +31,7 @@ Route::middleware(['auth:sanctum'])->group(function (){
 
         //GroupTools
         Route::get('/tools/groups', 'GroupToolController@index');
+        Route::get('/tools/groups/search', 'GroupToolController@searchData');
         Route::post('/tools/groups', 'GroupToolController@store');
         Route::put('/tools/groups/{id}', 'GroupToolController@update');
         Route::delete('/tools/groups/{id}', 'GroupToolController@destroy');
