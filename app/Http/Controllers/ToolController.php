@@ -26,6 +26,34 @@ class ToolController extends Controller
 
         }
     }
+    public function searchData(Request $request){
+
+        $Auth=Auth::user();
+        try {
+            $validator = \Validator::make($request->all(), [
+                'groupTools' => 'nullable|exists:group_tools,id,deleted_at,NULL,active,1',
+                'statusTools' =>'nullable|exists:status_tools,id,deleted_at,NULL',
+                'active' => 'nullable|boolean'
+            ]);
+            if ($validator->fails()) {
+                $responseArr['message'] = $validator->errors()->first();
+                return response()->json($responseArr, 500);
+            }
+
+            Log::info("User with email { $Auth->email} made a search on table tools");
+            return response()->json(Tool::where([
+                ["code", "LIKE", "%{$request->code}%"],
+                ["group_tools_id","LIKE", "%{$request->groupTools}%"],
+                ["active", "LIKE","%{$request->active}%"],
+                ["status_tools_id","LIKE", "%{$request->statusTools}%"]
+
+            ])
+                ->with(['statusTools','groupTools','user','projectTools'])->paginate(), 200);
+        } catch (\Exception $exception) {
+            Log::error("User with email { $Auth->email} receive an error on search tools( {$exception->getMessage()})");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
     public function store(Request $request)
     {
         $Auth=Auth::user();
