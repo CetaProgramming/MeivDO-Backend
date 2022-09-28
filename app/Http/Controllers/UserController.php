@@ -36,7 +36,6 @@ class UserController extends Controller
         $Auth=Auth::user();
         try {
             Log::info("User with email { $Auth->email} made a search on table users");
-            //a
             return response()->json(User::where("email", "LIKE", "%{$request->name}%")->orWhere("name", "LIKE", "%{$request->name}%")
             ->where("active", "LIKE", "%{$request->active}%")
             ->with(['role'])->paginate(), 200);
