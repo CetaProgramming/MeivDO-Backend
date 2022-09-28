@@ -44,8 +44,7 @@ class UserController extends Controller
                 return response()->json($responseArr, 500);
             }
             Log::info("User with email { $Auth->email} made a search on table users");
-            return response()->json(User::where("email", "LIKE", "%{$request->name}%")
-                ->where([
+            return response()->json(User::where([
                     ["name", "LIKE", "%{$request->name}%"],
                     ["active", "LIKE", "%{$request->active}%"]
                 ])
