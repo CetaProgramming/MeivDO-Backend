@@ -35,7 +35,8 @@ class GroupToolController extends Controller
         try {
 
             $validator = \Validator::make($request->all(), [
-                'active' => 'nullable|boolean'
+                'active' => 'nullable|boolean',
+                'category' =>'nullable|exists:category_tools,id,deleted_at,NULL,active,1',
             ]);
             if ($validator->fails()) {
                 $responseArr['message'] = $validator->errors()->first();
@@ -44,7 +45,8 @@ class GroupToolController extends Controller
             Log::info("User with email { $Auth->email} made a search on table groupTools");
             return response()->json(GroupTool::where([
                 ["code", "LIKE", "%{$request->name}%"],
-                ["active", "LIKE", "%{$request->active}%"]
+                ["active", "LIKE", "%{$request->active}%"],
+                ["category_tools_id", "LIKE", "%{$request->category}%"]
             ])
                 ->with(['categoryTools','user'])->paginate(), 200);
         } catch (\Exception $exception) {
