@@ -25,6 +25,29 @@ class CategoryToolController extends Controller
 
         }
     }
+    public function searchData(Request $request){
+
+        $Auth=Auth::user();
+        try {
+
+            $validator = \Validator::make($request->all(), [
+                'active' => 'nullable|boolean',
+            ]);
+            if ($validator->fails()) {
+                $responseArr['message'] = $validator->errors()->first();
+                return response()->json($responseArr, 500);
+            }
+            Log::info("User with email { $Auth->email} made a search on table categoryTools");
+            return response()->json(CategoryTool::where([
+                ["name", "LIKE", "%{$request->name}%"],
+                ["active", "LIKE", "%{$request->active}%"]
+            ])
+                ->with(['groupTools','user'])->paginate(), 200);
+        } catch (\Exception $exception) {
+            Log::error("User with email { $Auth->email} receive an error on search categoryTools( {$exception->getMessage()})");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
     public function store(Request $request)
     {
         $Auth=Auth::user();
