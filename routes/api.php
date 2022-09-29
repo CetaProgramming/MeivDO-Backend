@@ -37,6 +37,7 @@ Route::middleware(['auth:sanctum'])->group(function (){
         Route::delete('/tools/groups/{id}', 'GroupToolController@destroy');
         //CategoryTools
         Route::get('/tools/category', 'CategoryToolController@index');
+        Route::get('/tools/category/search', 'CategoryToolController@searchData');
         Route::post('/tools/category', 'CategoryToolController@store');
         Route::put('/tools/category/{id}', 'CategoryToolController@update');
         Route::delete('/tools/category/{id}', 'CategoryToolController@destroy');
