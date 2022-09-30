@@ -123,7 +123,7 @@ class ProjectController extends Controller
             }
             if($project->status==1) {
                 foreach ($project->projectTools()->get() as $projectTool) {
-                    $projectTool->tool->status_tools_id = 4;
+                    $projectTool->tool->status_tools_id = 2;
                     $projectTool->tool->save();
                 }
             }
