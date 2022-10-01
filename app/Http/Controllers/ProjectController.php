@@ -31,7 +31,9 @@ class ProjectController extends Controller
         try {
 
             $validator = \Validator::make($request->all(), [
-                'status' => 'nullable|boolean'
+                'status' => 'nullable|boolean',
+              'startDate' => 'nullable|date_format:Y/m/d',
+                'endDate' => 'nullable|date_format:Y/m/d'
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
@@ -41,7 +43,11 @@ class ProjectController extends Controller
             return response()->json(Project::where([
                     ["name", "LIKE", "%{$request->name}%"],
                     ["status", "LIKE", "%{$request->status}%"]
-                ])
+                ])->when( $request->startDate !='' ,function ($project){
+                    return $project->where("startDate", ">=", request('startDate'));
+                })->when( $request->endDate !='' ,function ($project){
+                return $project->where("endDate", "<=", request('endDate'));
+            })
                 ->with(['projectTools','user'])->paginate(), 200);
         } catch (\Exception $exception) {
             Log::error("User with email { $Auth->email} receive an error on search projects( {$exception->getMessage()})");
