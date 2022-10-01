@@ -32,8 +32,8 @@ class ProjectController extends Controller
 
             $validator = \Validator::make($request->all(), [
                 'status' => 'nullable|boolean',
-              'startDate' => 'nullable|date_format:Y/m/d',
-                'endDate' => 'nullable|date_format:Y/m/d'
+                $request->startDate && 'startDate' => 'nullable|date_format:Y/m/d',
+                $request->endDate  && 'endDate' => 'nullable|date_format:Y/m/d'
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
