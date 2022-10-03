@@ -26,6 +26,9 @@ class User extends Authenticatable
     public function project(){
         return $this->hasMany('App\Project');
     }
+    public function inspections(){
+        return $this->hasMany('App\Inspection');
+    }
     public function projectTools(){
         return $this->hasMany('App\ProjectTool');
     }
