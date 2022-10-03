@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 use App\groupTool;
 use App\Tool;
 use App\StatusTool;
-use App\Helpers\Active;
-use App\Helpers\IsDeleted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -70,8 +68,7 @@ class ToolController extends Controller
             }
             $tool->code=$request->code;
             $tool->group_tools_id=$request->group_tools_id;
-            IsDeleted::verifyDeleted(groupTool::onlyTrashed()->find($request->group_tools_id));
-            Active::verifyActive(groupTool::find($request->group_tools_id));
+
             $tool->status_tools_id=$request->status_tools_id;
             $tool->active=1;
             $tool->user_id=$Auth->id;
@@ -101,10 +98,9 @@ class ToolController extends Controller
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-            IsDeleted::verifyDeleted(groupTool::onlyTrashed()->find($request->group_tools_id));
-            Active::verifyActive(groupTool::find($request->group_tools_id));
+
             $statusTool = StatusTool::find(2);
-            if($request->active==0 && $request->status_tools_id != 2 ){
+            if($request->active==0 && $tool->status_tools_id != 2 ){
                 throw new \Exception("The tool must have the status in {$statusTool->name}", 500);
             }
             $tool->user_id=$Auth->id;
