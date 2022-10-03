@@ -21,6 +21,9 @@ class Tool extends Model
     public function  projectTools(){
         return $this->hasMany('App\ProjectTool');
     }
+    public function  inspections(){
+        return $this->hasMany('App\Inspections');
+    }
     protected static function booted()
     {
         static::deleting(function ($goalType) {
