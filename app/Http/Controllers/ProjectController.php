@@ -103,7 +103,7 @@ class ProjectController extends Controller
         $project->name=$request->name;
         $request->address && $project->address= $request->address;
         $request->startDate && $project->startDate = $request->startDate;
-        $request->endDate && $project->endDate=$request->endDate;
+        $project->endDate=$request->endDate;
         $project->user_id=$Auth->id;
         $project->save();
         Log::info("User with email {$Auth->email} updated project  number {$id} successfully");
