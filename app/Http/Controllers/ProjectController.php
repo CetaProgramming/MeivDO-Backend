@@ -89,32 +89,28 @@ class ProjectController extends Controller
 
       try {
         $project= project::find($id);
-         if (!$project) {
-             throw new \Exception("Project  with id: {$id} dont exist", 500);
-          }
-          $validator = \Validator::make($request->all(),[
-              'name' => 'required|unique:projects,name,'.$project->id.',id,deleted_at,NULL',
-              'address' => 'required',
-              'status' => 'required|boolean',
-              'startDate' => 'required|date_format:Y/m/d|after_or_equal:today',
-              'endDate' => 'required|date_format:Y/m/d|after_or_equal:startDate',
-         ]);
-         if ($validator->fails()) {
-              throw new \Exception($validator->errors()->first(), 500);
-          }
-          if($project->status==0){
-              foreach ($project->projectTools()->get() as $projectTool){
-                  $projectTool->tool->status_tools_id=4;
-                  $projectTool->tool->save();
-              }
-          }
-         $project->update($request->all());
-
-         Log::info("User with email {$Auth->email} updated project  number {$id} successfully");
-          return response()->json($project->load(['projectTools','user']), 200);
+        if (!$project) {
+            throw new \Exception("Project  with id: {$id} dont exist", 500);
+        }
+        $validator = \Validator::make($request->all(),[
+            'name' => 'required|unique:projects,name,'.$project->id.',id,deleted_at,NULL',
+            $request->startDate && 'startDate' => 'date_format:Y/m/d|after_or_equal:today',
+            $request->endDate && 'endDate' => 'nullable|date_format:Y/m/d|after_or_equal:startDate',
+        ]);
+        if ($validator->fails()) {
+            throw new \Exception($validator->errors()->first(), 500);
+        }
+        $project->name=$request->name;
+        $request->address && $project->address= $request->address;
+        $request->startDate && $project->startDate = $request->startDate;
+        $request->endDate && $project->endDate=$request->endDate;
+        $project->user_id=$Auth->id;
+        $project->save();
+        Log::info("User with email {$Auth->email} updated project  number {$id} successfully");
+        return response()->json($project->load(['projectTools','user']), 200);
       } catch (\Exception $exception) {
         Log::error("User with email {$Auth->email} try access update on  project but is not possible!Message error({$exception->getMessage()}");
-          return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        return response()->json(['error' => $exception->getMessage()], $exception->getCode());
        }
      }
     public function destroy($id)
