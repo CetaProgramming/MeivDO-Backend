@@ -16,4 +16,7 @@ class Inspection extends Model
     public function user(){
         return $this->belongsTo('App\User');
     }
+    public function inspectionTool(){
+        return $this->hasOne('App\InspectionTool');
+    }
 }
