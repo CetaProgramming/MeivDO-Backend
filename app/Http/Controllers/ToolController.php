@@ -61,15 +61,13 @@ class ToolController extends Controller
             $validator = \Validator::make($request->all(),[
                 'code'     => 'required|unique:tools,code,null,id,deleted_at,NULL',
                 'group_tools_id'       => 'required|exists:group_tools,id,deleted_at,NULL,active,1',
-                'status_tools_id' =>'required|exists:status_tools,id,deleted_at,NULL',
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
             $tool->code=$request->code;
             $tool->group_tools_id=$request->group_tools_id;
-
-            $tool->status_tools_id=$request->status_tools_id;
+            $tool->status_tools_id=2;
             $tool->active=1;
             $tool->user_id=$Auth->id;
             $tool->save();
@@ -93,7 +91,7 @@ class ToolController extends Controller
                 'code'     => 'required|unique:tools,code,'.$tool->id.',id,deleted_at,NULL',
                 'active'=>'required|boolean',
                 'group_tools_id'       => 'required|exists:group_tools,id,deleted_at,NULL,active,1',
-                'status_tools_id' =>'required|exists:status_tools,id,deleted_at,NULL',
+
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
@@ -104,7 +102,6 @@ class ToolController extends Controller
                 throw new \Exception("The tool must have the status in {$statusTool->name}", 500);
             }
             $tool->user_id=$Auth->id;
-
             $tool->update($request->all());
             Log::info("User with email {$Auth->email} updated Tool number {$id} successfully");
             return response()->json($tool->load(['statusTools','groupTools','user']), 200);
