@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Tool extends Model
 {
     use SoftDeletes;
-    protected $fillable = ['code','active','group_tools_id','status_tools_id'];
+    protected $fillable = ['code','active','group_tools_id'];
     public function statusTools(){
         return $this->belongsTo('App\StatusTool');
     }
