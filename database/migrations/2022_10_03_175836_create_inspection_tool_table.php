@@ -13,7 +13,7 @@ class CreateInspectionToolsTable extends Migration
      */
     public function up()
     {
-        Schema::create('inspection__tools', function (Blueprint $table) {
+        Schema::create('inspection_tools', function (Blueprint $table) {
             $table->id();
             $table->foreignId('inspection_id') -> constrained();
             $table->foreignId('tool_id') -> constrained();
