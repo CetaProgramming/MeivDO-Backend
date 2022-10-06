@@ -17,6 +17,13 @@ class Inspection extends Model
 
     public function inspectionTool(){
         return DB::table('inspection_tool')
-        ->where('inspection_id', '=', $this->id)->get();
+                ->where('inspection_id', '=', $this->id)->get();
+    }
+
+    public function getRelationShip(){
+        return [
+            "inspectionTool"=>$this->inspectionTool(),
+            "inspectionProjectTool" => $this->inspectionProjectTool($this->id, 'inspection_id')
+        ];
     }
 }

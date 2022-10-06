@@ -67,6 +67,40 @@ class InspectionController extends Controller
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
+
+    public function storeProjectTool(Request $request)
+    {
+        $Auth=Auth::user();
+        try {
+            $validator = \Validator::make($request->all(),[
+                'additionalDescription' => 'required',
+                'status' => 'required|boolean',
+                'inspection_projecttool_id' => 'required|exists:inspection_projecttool,id'
+            ]);
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first(), 500);
+            }
+
+            if(!is_null(Inspection::inspectionProjectTool($request->inspection_projecttool_id, 'id')[0]->inspection_id))
+                throw new \Exception("This inspection_projecttool already has a inspection", 500);
+            
+            $inspection= new Inspection();
+            $inspection->user_id=$Auth->id;
+            $inspection->status=$request->status;
+            $inspection->additionalDescription=$request->additionalDescription;
+            $inspection->save();
+            
+            Inspection::updInspectionId($request->inspection_projecttool_id, $inspection->id);
+            Inspection::updStatusTool($request->inspection_projecttool_id, $request->status ? 2 : 1);
+
+            Log::info("User with email { $Auth->email} created inspection number { $inspection-->id}");
+            return response()->json($inspection->load([]), 201);
+        } catch (\Exception $exception) {
+            Log::error("User with email { $Auth->email} receive an error on inspection( {$exception->getMessage()})");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
+
     public function update(Request $request,  $id)
     {
         $Auth=Auth::user();
@@ -80,6 +114,9 @@ class InspectionController extends Controller
                 'additionalDescription' => 'required',
                 'status' => 'required|boolean',
             ]);
+
+            dd($inspection->getRelationShip());
+
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
