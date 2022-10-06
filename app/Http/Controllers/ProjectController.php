@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Project;
 use App\ProjectTool;
 use App\Tool;
+use App\Inspection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -112,7 +113,89 @@ class ProjectController extends Controller
         Log::error("User with email {$Auth->email} try access update on  project but is not possible!Message error({$exception->getMessage()}");
         return response()->json(['error' => $exception->getMessage()], $exception->getCode());
        }
-     }
+    }
+
+    /** 
+     * Change Status The project is close or open
+     * 
+     * @param int $projectId
+     * @return Response/Json
+     *  */
+
+    public function changeStatusProject(int $projectId){
+        try {
+            $project = Project::find($projectId);
+            if($project->status){
+                $this->addProjectToolsOnInspection($project);
+            }
+            if(!$project->status){
+                $this->verifyAnyInpectionsIsDid($project);
+                $this->removeProjectToolsInInspections($project);
+            }
+            $project->status = $project->status ? 0 : 1;
+            $project->save();
+            
+            return response()->json($project->load(['projectTools','user']), 200);
+        } catch (\Exception $exception) {
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
+
+    /** 
+     * Verify if project has inspections finished
+     * 
+     * @param int $projectId
+     * @return Response/Json
+     *  */
+
+    private function verifyAnyInpectionsIsDid(Project $project){
+        $dataProjectToolsRelationShip = $project->projectTools;
+        if(!$dataProjectToolsRelationShip->count()){
+            return;  
+        }
+        for($i=0; $i < $dataProjectToolsRelationShip->count(); $i++){
+            $dataInspection = Inspection::inspectionProjectTool($dataProjectToolsRelationShip[$i]->id);
+            if(is_null($dataInspection)) 
+            return;
+            if(!is_null($dataInspection[0]->inspection_id))
+                throw new \Exception("The ProjectTool with id {$dataProjectToolsRelationShip[$i]->id} has a inspection finished, this way cannot change status project!", 500);
+        }
+    }
+
+     /** 
+     * Remove inspection on table inspections_projecttools
+     * 
+     * @param Project $projectId
+     * @return void
+     *  */
+
+    private function removeProjectToolsInInspections(Project $project){
+        $dataProjectToolsRelationShip = $project->projectTools;
+        for($i=0; $i < $dataProjectToolsRelationShip->count(); $i++){
+            $tool = Tool::find($dataProjectToolsRelationShip[$i]->tool_id);
+            $tool->status_tools_id = 3;
+            $tool->save();
+            Inspection::remInspectionProjectTool($dataProjectToolsRelationShip[$i]->id);
+        }
+    }
+
+     /** 
+     * Add inspection on table inspections_projecttools
+     * 
+     * @param Project $projectId
+     * @return void
+     *  */
+
+    private function addProjectToolsOnInspection(Project $project){
+        $dataProjectToolsRelationShip = $project->projectTools;
+        for($i=0; $i < $dataProjectToolsRelationShip->count(); $i++){
+            $tool = Tool::find($dataProjectToolsRelationShip[$i]->tool_id);
+            $tool->status_tools_id = 4;
+            $tool->save();
+            Inspection::addInspectionProjectTool($dataProjectToolsRelationShip[$i]->id);
+        }
+    }
+
     public function destroy($id)
     {
         $Auth =Auth::user();
