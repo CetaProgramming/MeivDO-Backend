@@ -19,4 +19,20 @@ class Inspection extends Model
         return DB::table('inspection_tool')
         ->where('inspection_id', '=', $this->id)->get();
     }
+
+    static public function inspectionProjectTool($projectToolId){
+        return DB::table('inspection_projecttool')
+        ->where('project_tools_id', '=', $projectToolId)->get();
+    }
+
+    static public function addInspectionProjectTool($projectToolId){
+        DB::table('inspection_projecttool')->insert([
+            'inspection_id' => NULL,
+            'project_tools_id' => $projectToolId
+        ]);
+    }
+
+    static public function remInspectionProjectTool($projectToolId){
+        DB::table('inspection_projecttool')->where('project_tools_id', '=', $projectToolId)->delete();
+    }
 }
