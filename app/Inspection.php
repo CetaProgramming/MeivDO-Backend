@@ -49,7 +49,11 @@ class Inspection extends Model
         return DB::table('inspection_projecttool')
         ->where($data, '=', $projectToolId)->get();
     }
+    static  public  function  missingInspections(){
 
+        return DB::table('inspection_projecttool')
+            ->where('inspection_id', '=', null)->get();
+    }
     static public function updInspectionId($projectToolId, $inspectionId){
         DB::table('inspection_projecttool')
         ->where('id', '=', $projectToolId)

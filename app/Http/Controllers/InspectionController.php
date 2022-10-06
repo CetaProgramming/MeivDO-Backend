@@ -138,6 +138,19 @@ class InspectionController extends Controller
         }
     }
 
+    public function  indexProjectTool(){
+        $Auth=Auth::user();
+
+        try {
+
+            Log::info("User with email {$Auth->email} get missing inspections  successfully");
+            return response()->json(Inspection::missingInspections(), 200);
+        } catch (\Exception $exception) {
+            Log::error("User with email {$Auth->email} try get  missing inspections  but not successfully!");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+
+        }
+    }
     /**
      * Update status tool with status inspection
      *
