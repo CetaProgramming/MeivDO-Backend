@@ -81,17 +81,14 @@ class InspectionController extends Controller
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-
-            
-            if( !is_null(Inspection::inspectionProjectTool($request->inspection_projecttool_id)[0]->inspection_id))
+            if(!is_null(Inspection::inspectionProjectTool($request->inspection_projecttool_id, 'id')[0]->inspection_id))
                 throw new \Exception("This inspection_projecttool already has a inspection", 500);
-            
+
             $inspection= new Inspection();
             $inspection->user_id=$Auth->id;
             $inspection->status=$request->status;
             $inspection->additionalDescription=$request->additionalDescription;
             $inspection->save();
-            
 
             Inspection::updInspectionId($request->inspection_projecttool_id, $inspection->id);
             Inspection::updStatusTool($request->inspection_projecttool_id, $request->status ? 2 : 1);
@@ -117,6 +114,9 @@ class InspectionController extends Controller
                 'additionalDescription' => 'required',
                 'status' => 'required|boolean',
             ]);
+
+            dd($inspection->getRelationShip());
+
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
@@ -136,9 +136,9 @@ class InspectionController extends Controller
         }
     }
 
-    /** 
+    /**
      * Update status tool with status inspection
-     * 
+     *
      * @param QueryBuilder $data
      * @param Boolean $status
      * @return void
