@@ -54,6 +54,7 @@ Route::middleware(['auth:sanctum'])->group(function (){
         Route::get('/projects/search', 'ProjectController@searchData');
         Route::post('/projects', 'ProjectController@store');
         Route::put('/projects/{id}', 'ProjectController@update');
+        Route::put('/projects/{id}/status', 'ProjectController@changeStatusProject');
         Route::delete('/projects/{id}', 'ProjectController@destroy');
         //ProjectTools
         Route::post('/projects/tools', 'ProjectToolController@store');
@@ -62,6 +63,7 @@ Route::middleware(['auth:sanctum'])->group(function (){
         //Inspections
         Route::get('/inspections', 'InspectionController@index');
         Route::post('/inspections', 'InspectionController@store');
+        Route::put('/inspections/{id}', 'InspectionController@update');
     });
     Route::get('/user', 'LoginController@user');
     Route::put('/changePassword','UserController@updatePassword');

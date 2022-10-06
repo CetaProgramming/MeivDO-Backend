@@ -20,7 +20,7 @@ class InspectionController extends Controller
         try {
 
             Log::info("User with email {$Auth->email} get inspections successfully");
-            return response()->json(Inspection::with([])->paginate(15), 200);
+            return response()->json(Inspection::paginate(15), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get  inspections but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -53,6 +53,7 @@ class InspectionController extends Controller
             $inspectionTool->inspection_id= $inspection->id;
             $inspectionTool->tool_id=$request->tool_id;
             $inspectionTool->save();
+
             if($request->status == 1){
                $tool->status_tools_id=2;
             }else{
@@ -64,6 +65,56 @@ class InspectionController extends Controller
         } catch (\Exception $exception) {
             Log::error("User with email { $Auth->email} receive an error on inspection( {$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
+    public function update(Request $request,  $id)
+    {
+        $Auth=Auth::user();
+
+        try {
+            $inspection= Inspection::find($id);
+            if (!$inspection) {
+                throw new \Exception("Inspection with id: {$id} dont exist", 500);
+            }
+            $validator = \Validator::make($request->all(),[
+                'additionalDescription' => 'required',
+                'status' => 'required|boolean',
+            ]);
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first(), 500);
+            }
+            if($request->status != $inspection->status){
+                $this->updatedStatusTool($inspection->inspectionTool(), $request->status);
+            }
+            $inspection->additionalDescription=$request->additionalDescription;
+            $inspection->user_id=$Auth->id;
+            $inspection->status=$request->status;
+            $inspection->update($request->all());
+
+            Log::info("User with email {$Auth->email} updated inspection number {$id} successfully");
+            return response()->json($inspection->load([]), 200);
+        } catch (\Exception $exception) {
+            Log::error("User with email {$Auth->email} try access update on inspection but is not possible!Message error({$exception->getMessage()}");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
+
+    /** 
+     * Update status tool with status inspection
+     * 
+     * @param QueryBuilder $data
+     * @param Boolean $status
+     * @return void
+    */
+
+    public function updatedStatusTool(\Illuminate\Support\Collection $data, bool $status){
+        if(!$data)
+            return;
+        $countData = count($data);
+        for($i=0; $i < $countData; $i++){
+            $tool = Tool::find($data[$i]->tool_id);
+            $tool->status_tools_id = filter_var($status, FILTER_VALIDATE_BOOLEAN) ? 2 : 1;
+            $tool->save();
         }
     }
 }
