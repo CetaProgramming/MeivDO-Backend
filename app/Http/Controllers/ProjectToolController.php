@@ -70,7 +70,7 @@ class ProjectToolController extends Controller
             if (!$projectTool) {
                 throw new \Exception("Project with id: {$id} dont exist", 500);
             }
-            $projectTool->tool->status_tools_id=4;
+            $projectTool->tool->status_tools_id=2;
             $projectTool->tool->save();
             $projectTool->delete();
             Log::info("User with email {$Auth->email} deleted project tool number {$id}");
