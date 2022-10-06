@@ -15,8 +15,9 @@ class CreateInspectionProjecttool extends Migration
     {
         Schema::create('inspection_projecttool', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('inspection_id')->constrained();
+            $table->foreignId('inspection_id')->nullable()->constrained();
             $table->foreignId('project_tools_id')->constrained();
+            $table->unique(['inspection_id','project_tools_id']);
             $table->timestamps();
         });
     }
