@@ -21,12 +21,30 @@ class Inspection extends Model
     }
 
     public function getRelationShip(){
-        return [
-            "inspectionTool"=>$this->inspectionTool(),
-            "inspectionProjectTool" => $this->inspectionProjectTool($this->id, 'inspection_id')
-        ];
+        if($this->inspectionTool()->count()){
+            return ["inspectionTool",$this->inspectionTool()];
+        }
+        return ["inspectionProjectTool", $this->inspectionProjectTool($this->id, 'inspection_id')];
     }
+    public function  updStatusTool($relationShip,$status){
 
+
+        if($relationShip[0]=="inspectionTool"){
+
+            $this->updToolStatusTool($relationShip[1][0]->tool_id,$status);
+        }elseif($relationShip[0]=="inspectionProjectTool"){
+            $this->updProjectStatusTool($relationShip[1][0]->id,$status);
+        }
+    }
+    public function  updToolStatusTool($tool_id,$status){
+        $tool = Tool::find($tool_id);
+        if($status == 1){
+            $tool->status_tools_id=2;
+        }else{
+            $tool->status_tools_id=1;
+        }
+        $tool->save();
+    }
     static public function inspectionProjectTool($projectToolId, $data = 'project_tools_id'){
         return DB::table('inspection_projecttool')
         ->where($data, '=', $projectToolId)->get();
@@ -38,16 +56,18 @@ class Inspection extends Model
         ->update(['inspection_id' => $inspectionId]);
     }
 
-    static public function updStatusTool($projectToolId, $status){
+    static public function updProjectStatusTool($projectToolId, $status){
         $data = DB::table('inspection_projecttool')
                     ->Rightjoin('project_tools', 'project_tools.id', '=', 'inspection_projecttool.project_tools_id')
                     ->select('project_tools.tool_id')
                     ->where('inspection_projecttool.id', '=', $projectToolId)
                     ->get();
 
+
         $tool = Tool::find($data[0]->tool_id);
-        $tool->status_tools_id = $status;
-        $tool->save(); 
+
+        $tool->status_tools_id = $status ? 2 : 1;
+        $tool->save();
     }
 
     static public function addInspectionProjectTool($projectToolId){

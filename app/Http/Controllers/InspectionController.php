@@ -54,13 +54,8 @@ class InspectionController extends Controller
             $inspectionTool->inspection_id= $inspection->id;
             $inspectionTool->tool_id=$request->tool_id;
             $inspectionTool->save();
+            $inspection->updToolStatusTool($request->tool_id,$request->status);
 
-            if($request->status == 1){
-               $tool->status_tools_id=2;
-            }else{
-                $tool->status_tools_id=1;
-            }
-            $tool->save();
             Log::info("User with email { $Auth->email} created inspection number { $inspection-->id}");
             return response()->json($inspection->load([]), 201);
         } catch (\Exception $exception) {
@@ -73,14 +68,19 @@ class InspectionController extends Controller
     {
         $Auth=Auth::user();
         try {
+
             $validator = \Validator::make($request->all(),[
                 'additionalDescription' => 'required',
                 'status' => 'required|boolean',
                 'inspection_projecttool_id' => 'required|exists:inspection_projecttool,id'
             ]);
+
+
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
+
+
             if(!is_null(Inspection::inspectionProjectTool($request->inspection_projecttool_id, 'id')[0]->inspection_id))
                 throw new \Exception("This inspection_projecttool already has a inspection", 500);
 
@@ -91,7 +91,7 @@ class InspectionController extends Controller
             $inspection->save();
 
             Inspection::updInspectionId($request->inspection_projecttool_id, $inspection->id);
-            Inspection::updStatusTool($request->inspection_projecttool_id, $request->status ? 2 : 1);
+            Inspection::updProjectStatusTool($request->inspection_projecttool_id, $request->status);
 
             Log::info("User with email { $Auth->email} created inspection number { $inspection-->id}");
             return response()->json($inspection->load([]), 201);
@@ -115,13 +115,15 @@ class InspectionController extends Controller
                 'status' => 'required|boolean',
             ]);
 
-            dd($inspection->getRelationShip());
+
 
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
             if($request->status != $inspection->status){
-                $this->updatedStatusTool($inspection->inspectionTool(), $request->status);
+
+                $inspection->updStatusTool($inspection->getRelationShip(),$request->status);
+                //$this->updatedStatusTool($inspection->inspectionTool(), $request->status);
             }
             $inspection->additionalDescription=$request->additionalDescription;
             $inspection->user_id=$Auth->id;
@@ -144,14 +146,14 @@ class InspectionController extends Controller
      * @return void
     */
 
-    public function updatedStatusTool(\Illuminate\Support\Collection $data, bool $status){
-        if(!$data)
-            return;
-        $countData = count($data);
-        for($i=0; $i < $countData; $i++){
-            $tool = Tool::find($data[$i]->tool_id);
-            $tool->status_tools_id = filter_var($status, FILTER_VALIDATE_BOOLEAN) ? 2 : 1;
-            $tool->save();
-        }
-    }
+    //public function updatedStatusTool(\Illuminate\Support\Collection $data, bool $status){
+     //   if(!$data)
+     //       return;
+     //   $countData = count($data);
+     //   for($i=0; $i < $countData; $i++){
+      //      $tool = Tool::find($data[$i]->tool_id);
+      //      $tool->status_tools_id = filter_var($status, FILTER_VALIDATE_BOOLEAN) ? 2 : 1;
+      //      $tool->save();
+     //   }
+    //}
 }
