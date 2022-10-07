@@ -16,16 +16,40 @@ class Inspection extends Model
     }
 
     public function inspectionTool(){
+
         return DB::table('inspection_tool')
                 ->where('inspection_id', '=', $this->id)->get();
     }
 
+    public function getRelationToolOrProjectTool(){
+
+        $this->inspectionDetails = $this->getRelationShipTable();
+
+    }
+    function getRelationShipTable(){
+        if($this->inspectionTool()->count()>0){
+            $tool = Tool::find($this->inspectionTool()[0]->tool_id);
+           // return ["Tool",$tool];
+            return ["Tool"=>$tool];
+        }
+
+            $inspectionProject= $this->inspectionProjectTool($this->id, 'inspection_id')[0];
+            $project_tool = ProjectTool::find($inspectionProject->project_tools_id);
+            $tool = Tool::find($project_tool->tool_id);
+            $project = Project::find($project_tool->project_id);
+
+
+       return  ["Tool"=>$tool,"Project"=>$project];
+
+
+    }
     public function getRelationShip(){
         if($this->inspectionTool()->count()){
             return ["inspectionTool",$this->inspectionTool()];
         }
         return ["inspectionProjectTool", $this->inspectionProjectTool($this->id, 'inspection_id')];
     }
+
     public function  updStatusTool($relationShip,$status){
 
 

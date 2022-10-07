@@ -10,6 +10,7 @@ use App\Inspection_Tool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use function PHPUnit\Framework\isEmpty;
 
 class InspectionController extends Controller
 {
@@ -18,9 +19,14 @@ class InspectionController extends Controller
         $Auth=Auth::user();
 
         try {
+            //Inspection::returnInspection();
 
             Log::info("User with email {$Auth->email} get inspections successfully");
-            return response()->json(Inspection::paginate(15), 200);
+            return response()->json(Inspection::with(['user'])->paginate(15)->each(function ($inspection) {
+                if($inspection->inspectionProjectTool($inspection->id, 'inspection_id')->count() >0 || $inspection->inspectionTool()->count()>0){
+                $inspection->getRelationToolOrProjectTool();
+                }
+            }), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get  inspections but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());

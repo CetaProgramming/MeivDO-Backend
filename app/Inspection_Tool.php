@@ -12,6 +12,7 @@ class Inspection_Tool extends Model
     use SoftDeletes;
 
     public function tool(){
+
         return $this->belongsTo('App\Tool');
     }
     public function inspection(){
