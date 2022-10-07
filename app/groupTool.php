@@ -17,5 +17,16 @@ class groupTool extends Model
     public function user(){
         return $this->belongsTo('App\User');
     }
+    public function tools(){
+        return $this->hasMany('App\Tool','group_tools_id','id');
+    }
+    protected static function booted()
+    {
+        static::deleting(function ($goalType) {
 
+            if ($goalType->tools()->get()->count()>0) {
+                throw new \Exception("The groupTool have relations", 500);
+            }
+        });
+    }
 }
