@@ -115,9 +115,9 @@ class ProjectController extends Controller
        }
     }
 
-    /** 
+    /**
      * Change Status The project is close or open
-     * 
+     *
      * @param int $projectId
      * @return Response/Json
      *  */
@@ -125,6 +125,9 @@ class ProjectController extends Controller
     public function changeStatusProject(int $projectId){
         try {
             $project = Project::find($projectId);
+            if (!$project) {
+                throw new \Exception("Project  with id: {$projectId} dont exist", 500);
+            }
             if($project->status){
                 $this->addProjectToolsOnInspection($project);
             }
@@ -134,16 +137,16 @@ class ProjectController extends Controller
             }
             $project->status = $project->status ? 0 : 1;
             $project->save();
-            
+
             return response()->json($project->load(['projectTools','user']), 200);
         } catch (\Exception $exception) {
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
 
-    /** 
+    /**
      * Verify if project has inspections finished
-     * 
+     *
      * @param int $projectId
      * @return Response/Json
      *  */
@@ -151,20 +154,20 @@ class ProjectController extends Controller
     private function verifyAnyInpectionsIsDid(Project $project){
         $dataProjectToolsRelationShip = $project->projectTools;
         if(!$dataProjectToolsRelationShip->count()){
-            return;  
+            return;
         }
         for($i=0; $i < $dataProjectToolsRelationShip->count(); $i++){
             $dataInspection = Inspection::inspectionProjectTool($dataProjectToolsRelationShip[$i]->id);
-            if(is_null($dataInspection)) 
+            if(is_null($dataInspection))
             return;
             if(!is_null($dataInspection[0]->inspection_id))
                 throw new \Exception("The ProjectTool with id {$dataProjectToolsRelationShip[$i]->id} has a inspection finished, this way cannot change status project!", 500);
         }
     }
 
-     /** 
+     /**
      * Remove inspection on table inspections_projecttools
-     * 
+     *
      * @param Project $projectId
      * @return void
      *  */
@@ -179,9 +182,9 @@ class ProjectController extends Controller
         }
     }
 
-     /** 
+     /**
      * Add inspection on table inspections_projecttools
-     * 
+     *
      * @param Project $projectId
      * @return void
      *  */
