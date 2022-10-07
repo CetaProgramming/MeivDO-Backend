@@ -20,9 +20,12 @@ class InspectionController extends Controller
 
         try {
             //Inspection::returnInspection();
+
             Log::info("User with email {$Auth->email} get inspections successfully");
             return response()->json(Inspection::with(['user'])->paginate(15)->each(function ($inspection) {
+                if($inspection->inspectionProjectTool($inspection->id, 'inspection_id')->count() >0 || $inspection->inspectionTool()->count()>0){
                 $inspection->getRelationToolOrProjectTool();
+                }
             }), 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get  inspections but not successfully!");

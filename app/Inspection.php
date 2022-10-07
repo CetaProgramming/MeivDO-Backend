@@ -23,18 +23,23 @@ class Inspection extends Model
 
     public function getRelationToolOrProjectTool(){
 
-        $this->inspectionDetails = $this->getRelationShipTable()[1];
+        $this->inspectionDetails = $this->getRelationShipTable();
 
     }
-    public function getRelationShipTable(){
+    function getRelationShipTable(){
         if($this->inspectionTool()->count()>0){
-            return ["inspectionTool",$this->inspectionTool()];
-        }elseif($this->inspectionProjectTool()->count()>0){
-            return ["inspectionProjectTool", $this->inspectionProjectTool($this->id, 'inspection_id')];
-        }else{
-            return  [];
+            $tool = Tool::find($this->inspectionTool()[0]->tool_id);
+           // return ["Tool",$tool];
+            return ["Tool"=>$tool];
         }
 
+            $inspectionProject= $this->inspectionProjectTool($this->id, 'inspection_id')[0];
+            $project_tool = ProjectTool::find($inspectionProject->project_tools_id);
+            $tool = Tool::find($project_tool->tool_id);
+            $project = Project::find($project_tool->project_id);
+
+
+       return  ["Tool"=>$tool,"Project"=>$project];
 
 
     }
