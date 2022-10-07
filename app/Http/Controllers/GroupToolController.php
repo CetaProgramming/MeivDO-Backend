@@ -60,7 +60,7 @@ class GroupToolController extends Controller
         try {
             $validator = \Validator::make($request->all(),[
                 'code'     => 'required|unique:group_tools,code,null,id,deleted_at,NULL',
-                'image'       => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'category' =>'required|exists:category_tools,id,deleted_at,NULL,active,1',
                 'description' => 'required',
             ]);
@@ -94,7 +94,7 @@ class GroupToolController extends Controller
             }
             $validator = \Validator::make($request->all(),[
                 'code'     => 'required|unique:group_tools,code,'.$groupTool->id.',id,deleted_at,NULL',
-                'image'       => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'category' =>'required|exists:category_tools,id,deleted_at,NULL,active,1',
                 'active'=>'required|boolean',
                 'description' => 'required',
