@@ -102,10 +102,11 @@ class GroupToolController extends Controller
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-
+            $groupTool->code = $request->code;
             $groupTool->category_tools_id=$request->category;
+            $groupTool->active = $request->active;
+            $groupTool->description = $request->description;
             $groupTool->user_id=$Auth->id;
-            $groupTool->update($request->all());
             $request->image && $groupTool->image=ImageUpload::saveImage($request,"group_tools",$groupTool);
             $groupTool->save();
             Log::info("User with email {$Auth->email} updated groupTool number {$id} successfully");
