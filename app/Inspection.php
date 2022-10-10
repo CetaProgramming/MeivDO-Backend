@@ -14,13 +14,11 @@ class Inspection extends Model
     public function user(){
         return $this->belongsTo('App\User');
     }
-
     public function inspectionTool(){
 
         return DB::table('inspection_tool')
                 ->where('inspection_id', '=', $this->id)->get();
     }
-
     public function getRelationToolOrProjectTool(){
 
         $this->inspectionDetails = $this->getRelationShipTable();
@@ -49,7 +47,6 @@ class Inspection extends Model
         }
         return ["inspectionProjectTool", $this->inspectionProjectTool($this->id, 'inspection_id')];
     }
-
     public function  updStatusTool($relationShip,$status){
 
 
@@ -83,7 +80,6 @@ class Inspection extends Model
         ->where('id', '=', $projectToolId)
         ->update(['inspection_id' => $inspectionId]);
     }
-
     static public function updProjectStatusTool($projectToolId, $status){
         $data = DB::table('inspection_projecttool')
                     ->Rightjoin('project_tools', 'project_tools.id', '=', 'inspection_projecttool.project_tools_id')
@@ -97,15 +93,35 @@ class Inspection extends Model
         $tool->status_tools_id = $status ? 2 : 1;
         $tool->save();
     }
-
     static public function addInspectionProjectTool($projectToolId){
         DB::table('inspection_projecttool')->insert([
             'inspection_id' => NULL,
             'project_tools_id' => $projectToolId
         ]);
     }
-
     static public function remInspectionProjectTool($projectToolId){
         DB::table('inspection_projecttool')->where('project_tools_id', '=', $projectToolId)->delete();
+    }
+    public function GetTablesByToolid(){
+        $tool_id =0;
+        if($this->getRelationShip()[0]=="inspectionTool"){
+            $tool_id = $this->getRelationShip()[1][0]->tool_id;
+        }elseif($this->getRelationShip()[0]=="inspectionProjectTool"){
+            $data = DB::table('inspection_projecttool')
+                ->Rightjoin('project_tools', 'project_tools.id', '=', 'inspection_projecttool.project_tools_id')
+                ->select('project_tools.tool_id')
+                ->where('inspection_projecttool.id', '=', $this->getRelationShip()[1][0]->id)
+                ->get();
+            $tool_id = Tool::find($data[0]->tool_id)->id;
+        }
+       dd($tool_id);
+       // return DB::table('inspection_tool')
+        //    ->where("tool_id", '=', $tool_id)->get();
+
+    }
+    public  function  validateDelete(){
+
+        // $this->updStatusTool($relationShip,$status)
+        $this->GetTablesByToolid();
     }
 }
