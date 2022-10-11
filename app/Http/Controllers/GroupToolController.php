@@ -44,7 +44,7 @@ class GroupToolController extends Controller
             }
             Log::info("User with email { $Auth->email} made a search on table groupTools");
             return response()->json(GroupTool::where([
-                ["code", "LIKE", "%{$request->name}%"],
+                ["code", "LIKE", "%{$request->code}%"],
                 ["active", "LIKE", "%{$request->active}%"],
                 ["category_tools_id", "LIKE", "%{$request->category}%"]
             ])
