@@ -14,10 +14,10 @@ class Inspection extends Model
     public function user(){
         return $this->belongsTo('App\User');
     }
-    public function inspectionTool(){
+    public function inspectionTool($column="inspection_id",$value=null){
 
         return DB::table('inspection_tool')
-                ->where('inspection_id', '=', $this->id)->get();
+                ->where($column, '=',$value ?? $this->id)->get();
     }
     public function getRelationToolOrProjectTool(){
 
@@ -96,25 +96,49 @@ class Inspection extends Model
     static public function addInspectionProjectTool($projectToolId){
         DB::table('inspection_projecttool')->insert([
             'inspection_id' => NULL,
+            'created_at'=> now(),
+            'updated_at' => now(),
             'project_tools_id' => $projectToolId
         ]);
     }
     static public function remInspectionProjectTool($projectToolId){
         DB::table('inspection_projecttool')->where('project_tools_id', '=', $projectToolId)->delete();
     }
+    public  function  LastRow($table,$tool_id){
+        return $table
+            ->where("tool_id", '=',$tool_id)->orderBy('created_at', 'desc')->first();
+    }
     public function GetTablesByToolid(){
         $tool_id =0;
+
+        $data = DB::table('inspection_projecttool')
+            ->Rightjoin('project_tools', 'project_tools.id', '=', 'inspection_projecttool.project_tools_id');
         if($this->getRelationShip()[0]=="inspectionTool"){
             $tool_id = $this->getRelationShip()[1][0]->tool_id;
         }elseif($this->getRelationShip()[0]=="inspectionProjectTool"){
-            $data = DB::table('inspection_projecttool')
-                ->Rightjoin('project_tools', 'project_tools.id', '=', 'inspection_projecttool.project_tools_id')
-                ->select('project_tools.tool_id')
+           $dataWithRelation= $data->select('project_tools.tool_id')
                 ->where('inspection_projecttool.id', '=', $this->getRelationShip()[1][0]->id)
                 ->get();
-            $tool_id = Tool::find($data[0]->tool_id)->id;
+            $tool_id = Tool::find($dataWithRelation[0]->tool_id)->id;
+
+        }
+
+        $inspectionDateTime= explode(' ', $this->created_at->ToDateTimeString());
+        $lastInspectionToolDateTime= explode(' ', $this->LastRow(DB::table('inspection_tool'),$tool_id)->created_at);
+
+        $projectToolTable =$data->where('inspection_id','!=',null);
+dd( $projectToolTable->get());
+       dd($projectToolTable->where("tool_id", '=',$tool_id)->orderBy('inspection_projecttool.created_at', 'desc')->first());
+
+        $lastInspectionProjectTool =  explode(' ', $this->LastRow($projectToolTable,$tool_id)->created_at);
+
+        if ($inspectionDateTime[0] ==$lastInspectionToolDateTime[0] && $inspectionDateTime[1] ==$lastInspectionToolDateTime[1]){
+            dd("Ultima inspeção");
+        }elseif($inspectionDateTime){
+            dd("Não é Ultima inspeção");
         }
        dd($tool_id);
+
        // return DB::table('inspection_tool')
         //    ->where("tool_id", '=', $tool_id)->get();
 
