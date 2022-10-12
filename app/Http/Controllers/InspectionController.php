@@ -152,8 +152,13 @@ class InspectionController extends Controller
             if (!$inspection) {
                 throw new \Exception("Inspection with id: {$id} dont exist", 500);
             }
-            $inspection->validateDelete();
-            $inspection->delete();
+            dd($inspection->validateDelete());
+            if($inspection->validateDelete()){
+                $inspection->delete();
+            }else{
+                throw new \Exception("Inspection with id: {$id} cannot be  deleted", 500);
+            }
+
             Log::info("User with email {$Auth->email} deleted inspection number {$id}");
             return response()->json(['message' => 'Deleted'], 200);
         } catch (Exception $exception) {
@@ -174,13 +179,13 @@ class InspectionController extends Controller
 
         }
     }
-    /**
-     * Update status tool with status inspection
-     *
-     * @param QueryBuilder $data
-     * @param Boolean $status
-     * @return void
-    */
+   // /**
+    // * Update status tool with status inspection
+    // *
+    // * @param QueryBuilder $data
+    // * @param Boolean $status
+   //  * @return void
+   // */
     //public function updatedStatusTool(\Illuminate\Support\Collection $data, bool $status){
      //   if(!$data)
      //       return;

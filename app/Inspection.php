@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
-
+use Carbon\Carbon;
 class Inspection extends Model
 {
     protected $fillable = ['additionalDescription','status','user_id'];
@@ -104,48 +104,84 @@ class Inspection extends Model
     static public function remInspectionProjectTool($projectToolId){
         DB::table('inspection_projecttool')->where('project_tools_id', '=', $projectToolId)->delete();
     }
-    public  function  LastRow($table,$tool_id){
-        return $table
-            ->where("tool_id", '=',$tool_id)->orderBy('created_at', 'desc')->first();
-    }
-    public function GetTablesByToolid(){
-        $tool_id =0;
+    public  function  LastRow($table,$tool_id,$date){
 
-        $data = DB::table('inspection_projecttool')
+
+        $filterTable=  $table->where("tool_id", '=',$tool_id);
+       if($filterTable->get()->isEmpty()){
+           $inspectionDateTime= explode(' ', $this->created_at->ToDateTimeString());
+           $inspectionDateTime[0] =  Carbon::parse(  $inspectionDateTime[0].' -30 days')->ToDateString();
+           return $inspectionDateTime[0].' '.$inspectionDateTime[1];
+       }
+        return $filterTable
+            ->where("tool_id", '=',$tool_id)->orderBy($date, 'desc')->first()->created_at;
+    }
+    public  function  GetProjectToolsWithJoin(){
+        return DB::table('inspection_projecttool')
             ->Rightjoin('project_tools', 'project_tools.id', '=', 'inspection_projecttool.project_tools_id');
+    }
+    public function  GetInspectionToolId(){
+        $tool_id=0;
         if($this->getRelationShip()[0]=="inspectionTool"){
             $tool_id = $this->getRelationShip()[1][0]->tool_id;
+
         }elseif($this->getRelationShip()[0]=="inspectionProjectTool"){
-           $dataWithRelation= $data->select('project_tools.tool_id')
+            $dataWithRelation = $this->GetProjectToolsWithJoin();
+            $dataWithRelation->select('project_tools.tool_id')
                 ->where('inspection_projecttool.id', '=', $this->getRelationShip()[1][0]->id)
                 ->get();
-            $tool_id = Tool::find($dataWithRelation[0]->tool_id)->id;
+            $tool_id = Tool::find($dataWithRelation->get()[0]->tool_id)->id;
 
         }
+        return $tool_id;
+    }
+    public function isLastInspection($tool_id){
 
+        $data = $this->GetProjectToolsWithJoin();
         $inspectionDateTime= explode(' ', $this->created_at->ToDateTimeString());
-        $lastInspectionToolDateTime= explode(' ', $this->LastRow(DB::table('inspection_tool'),$tool_id)->created_at);
-
+        $lastInspectionToolDateTime= explode(' ', $this->LastRow(DB::table('inspection_tool'),$tool_id,'created_at'));
         $projectToolTable =$data->where('inspection_id','!=',null);
-dd( $projectToolTable->get());
-       dd($projectToolTable->where("tool_id", '=',$tool_id)->orderBy('inspection_projecttool.created_at', 'desc')->first());
-
-        $lastInspectionProjectTool =  explode(' ', $this->LastRow($projectToolTable,$tool_id)->created_at);
+        $lastProjectToolTableDateTime = explode(' ',$this->LastRow($projectToolTable,$tool_id,'inspection_projecttool.created_at'));
 
         if ($inspectionDateTime[0] ==$lastInspectionToolDateTime[0] && $inspectionDateTime[1] ==$lastInspectionToolDateTime[1]){
-            dd("Ultima inspeção");
-        }elseif($inspectionDateTime){
-            dd("Não é Ultima inspeção");
+            return true;
+        }elseif($inspectionDateTime[0] ==   $lastProjectToolTableDateTime[0] && $inspectionDateTime[1] == $lastProjectToolTableDateTime[1]){
+           return  true;
+        }else{
+           return  false;
         }
-       dd($tool_id);
 
-       // return DB::table('inspection_tool')
-        //    ->where("tool_id", '=', $tool_id)->get();
 
     }
+
+    /**
+     * comentário
+     * @param
+     * @return boolean
+     */
     public  function  validateDelete(){
 
-        // $this->updStatusTool($relationShip,$status)
-        $this->GetTablesByToolid();
+        $tool_id =$this->GetInspectionToolId();
+
+        // Only delete inspection when not exist a reparation associate;
+        $tool = Tool::find($tool_id);
+        if(($tool->status_tools_id == 1 ||$tool->status_tools_id == 2) && $this->isLastInspection($tool_id)==true){
+
+            if($this-> getRelationShip()[0]=="inspectionTool"){
+                $this->updToolStatusTool($tool_id,1);
+                //Delete Inspection line
+            }elseif($this-> getRelationShip()[0]=="inspectionProjectTool"){
+               $inspectionProjectTool= $this->inspectionProjectTool($this->id, $data = 'inspection_id');
+               $inspectionProjectTool->inspection_id = null;
+               $inspectionProjectTool->save();
+               $tool->status_tools_id = 4;
+            }
+            return true;
+        }else{
+            return false;
+        }
+
+
+
     }
 }
