@@ -46,7 +46,7 @@ class GroupToolController extends Controller
             return response()->json(GroupTool::where([
                 ["code", "LIKE", "%{$request->code}%"],
                 ["active", "LIKE", "%{$request->active}%"],
-                ["category_tools_id", "LIKE", "%{$request->category}%"]
+                !$request->category ? ["category_tools_id","LIKE", $request->category] : ["category_tools_id","=", (int) $request->category],
             ])
                 ->with(['categoryTools','user'])->paginate(), 200);
         } catch (\Exception $exception) {
