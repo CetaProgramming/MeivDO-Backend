@@ -30,7 +30,7 @@ class ToolController extends Controller
         $Auth=Auth::user();
         try {
             $validator = \Validator::make($request->all(), [
-                'groupTools' => 'nullable|exists:group_tools,id,deleted_at,NULL,active,1',
+                'groupTools' => 'nullable|exists:group_tools,id,deleted_at,NULL',
                 'statusTools' =>'nullable|exists:status_tools,id,deleted_at,NULL',
                 'active' => 'nullable|boolean'
             ]);
@@ -38,14 +38,12 @@ class ToolController extends Controller
                 $responseArr['message'] = $validator->errors()->first();
                 return response()->json($responseArr, 500);
             }
-
             Log::info("User with email { $Auth->email} made a search on table tools");
             return response()->json(Tool::where([
                 ["code", "LIKE", "%{$request->code}%"],
-                ["group_tools_id","LIKE", "%{$request->groupTools}%"],
+                !$request->groupTools ? ["group_tools_id","LIKE", $request->groupTools] : ["group_tools_id","=", (int) $request->groupTools],
                 ["active", "LIKE","%{$request->active}%"],
-                ["status_tools_id","LIKE", "%{$request->statusTools}%"]
-
+                !$request->statusTools ? ["status_tools_id","LIKE", $request->statusTools] : ["status_tools_id","=", (int) $request->statusTools],
             ])
                 ->with(['statusTools','groupTools','user','projectTools'])->paginate(), 200);
         } catch (\Exception $exception) {
