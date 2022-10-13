@@ -70,10 +70,10 @@ class Inspection extends Model
         return DB::table('inspection_projecttool')
         ->where($data, '=', $projectToolId)->get();
     }
-    static  public  function  missingInspections(){
-
-        return DB::table('inspection_projecttool')
-            ->where('inspection_id', '=', null)->get();
+    static  public  function  missingInspections($withGet = true){
+        $data = DB::table('inspection_projecttool')
+        ->where('inspection_id', '=', null);
+        return $withGet ? $data->get() : $data;
     }
     static public function updInspectionId($projectToolId, $inspectionId){
         DB::table('inspection_projecttool')
