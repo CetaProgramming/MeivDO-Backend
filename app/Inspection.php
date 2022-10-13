@@ -141,8 +141,15 @@ class Inspection extends Model
         $lastInspectionToolDateTime= explode(' ', $this->LastRow(DB::table('inspection_tool'),$tool_id,'created_at'));
         $projectToolTable =$data->where('inspection_id','!=',null);
         $lastProjectToolTableDateTime = explode(' ',$this->LastRow($projectToolTable,$tool_id,'inspection_projecttool.created_at'));
-        $lastDateInspections = $lastInspectionToolDateTime[0] >= $lastProjectToolTableDateTime[0] &&  $lastInspectionToolDateTime[1] > $lastProjectToolTableDateTime[1] ? $lastInspectionToolDateTime :$lastProjectToolTableDateTime;
-
+        $lastDateInspections=0;
+       if($lastInspectionToolDateTime[0] > $lastProjectToolTableDateTime[0] ||$lastInspectionToolDateTime[0] == $lastProjectToolTableDateTime[0] &&   $lastInspectionToolDateTime[1] > $lastProjectToolTableDateTime[1]){
+            $lastDateInspections = $lastInspectionToolDateTime ;
+        }else{
+            $lastDateInspections = $lastProjectToolTableDateTime;
+        }
+        //dd( $lastInspectionToolDateTime,$lastProjectToolTableDateTime,$lastInspectionToolDateTime[0] >= $lastProjectToolTableDateTime[0],$lastInspectionToolDateTime[1] > $lastProjectToolTableDateTime[1]);
+      //  dd( $lastInspectionToolDateTime,$lastProjectToolTableDateTime,$lastDateInspections );
+    //dd($lastDateInspections ," ", $inspectionDateTime);
         if ($inspectionDateTime[0] ==$lastDateInspections[0] && $inspectionDateTime[1] ==$lastDateInspections[1]){
             return true;
         }
@@ -158,8 +165,10 @@ class Inspection extends Model
 
         $tool_id =$this->GetInspectionToolId();
 
+
         // Only delete inspection when not exist a reparation associate;
         $tool = Tool::find($tool_id);
+
         if(($tool->status_tools_id == 1 ||$tool->status_tools_id == 2) && $this->isLastInspection($tool_id)==true){
             if($this-> getRelationShip()[0]=="inspectionTool"){
                 $this->updToolStatusTool($tool_id,2);
