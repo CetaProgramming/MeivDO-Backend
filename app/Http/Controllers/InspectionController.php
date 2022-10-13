@@ -122,19 +122,23 @@ class InspectionController extends Controller
             ]);
 
 
-
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-            if($request->status != $inspection->status){
+
+            $tool_id = $inspection->GetInspectionToolId();
+
+            if($request->status != $inspection->status &&  $inspection->isLastInspection($tool_id)==true){
 
                 $inspection->updStatusTool($inspection->getRelationShip(),$request->status);
-                //$this->updatedStatusTool($inspection->inspectionTool(), $request->status);
+                $inspection->additionalDescription=$request->additionalDescription;
+                $inspection->user_id=$Auth->id;
+                $inspection->status=$request->status;
+                $inspection->update($request->all());
+            }else{
+                throw new \Exception("Inspection with id: {$id} cannot be updated", 500);
             }
-            $inspection->additionalDescription=$request->additionalDescription;
-            $inspection->user_id=$Auth->id;
-            $inspection->status=$request->status;
-            $inspection->update($request->all());
+
 
             Log::info("User with email {$Auth->email} updated inspection number {$id} successfully");
             return response()->json($inspection->load([]), 200);
@@ -152,6 +156,7 @@ class InspectionController extends Controller
             if (!$inspection) {
                 throw new \Exception("Inspection with id: {$id} dont exist", 500);
             }
+
             if($inspection->validateDelete()){
                 $inspection->delete();
             }else{
