@@ -144,6 +144,27 @@ class InspectionController extends Controller
         }
     }
 
+    public function destroy($id)
+    {
+        $Auth =Auth::user();
+        try {
+            $inspection= Inspection::find($id);
+            if (!$inspection) {
+                throw new \Exception("Inspection with id: {$id} dont exist", 500);
+            }
+            if($inspection->validateDelete()){
+                $inspection->delete();
+            }else{
+                throw new \Exception("Inspection with id: {$id} cannot be  deleted", 500);
+            }
+
+            Log::info("User with email {$Auth->email} deleted inspection number {$id}");
+            return response()->json(['message' => 'Deleted'], 200);
+        } catch (Exception $exception) {
+            Log::error("User with email {$Auth->email} try access destroy  on  inspection but  is not possible!Message error({$exception->getMessage()})");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
     public function  indexProjectTool(){
         $Auth=Auth::user();
 
@@ -157,14 +178,13 @@ class InspectionController extends Controller
 
         }
     }
-    /**
-     * Update status tool with status inspection
-     *
-     * @param QueryBuilder $data
-     * @param Boolean $status
-     * @return void
-    */
-
+   // /**
+    // * Update status tool with status inspection
+    // *
+    // * @param QueryBuilder $data
+    // * @param Boolean $status
+   //  * @return void
+   // */
     //public function updatedStatusTool(\Illuminate\Support\Collection $data, bool $status){
      //   if(!$data)
      //       return;
