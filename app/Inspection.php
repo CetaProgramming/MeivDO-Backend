@@ -147,9 +147,6 @@ class Inspection extends Model
         }else{
             $lastDateInspections = $lastProjectToolTableDateTime;
         }
-        //dd( $lastInspectionToolDateTime,$lastProjectToolTableDateTime,$lastInspectionToolDateTime[0] >= $lastProjectToolTableDateTime[0],$lastInspectionToolDateTime[1] > $lastProjectToolTableDateTime[1]);
-      //  dd( $lastInspectionToolDateTime,$lastProjectToolTableDateTime,$lastDateInspections );
-    //dd($lastDateInspections ," ", $inspectionDateTime);
         if ($inspectionDateTime[0] ==$lastDateInspections[0] && $inspectionDateTime[1] ==$lastDateInspections[1]){
             return true;
         }
