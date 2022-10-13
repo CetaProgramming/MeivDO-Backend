@@ -95,12 +95,17 @@ class GroupToolController extends Controller
             $validator = \Validator::make($request->all(),[
                 'code'     => 'required|unique:group_tools,code,'.$groupTool->id.',id,deleted_at,NULL',
                 'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'category' =>'required|exists:category_tools,id,deleted_at,NULL,active,1',
+                'category' =>'required|exists:category_tools,id,deleted_at,NULL',
                 'active'=>'required|boolean',
                 'description' => 'required',
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
+            }
+            if($groupTool->category_tools_id != $request->category){
+                $category = categoryTool::find($request->category);
+                if(!$category || !$category->active)
+                    throw new \Exception("The category is invalid!", 500);
             }
             $groupTool->code = $request->code;
             $groupTool->category_tools_id=$request->category;
