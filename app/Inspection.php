@@ -114,7 +114,7 @@ class Inspection extends Model
            return $inspectionDateTime[0].' '.$inspectionDateTime[1];
        }
         return $filterTable
-            ->where("tool_id", '=',$tool_id)->orderBy($date, 'desc')->first()->created_at;
+           ->orderBy($date, 'desc')->first()->created_at;
     }
     public  function  GetProjectToolsWithJoin(){
         return DB::table('inspection_projecttool')
@@ -131,7 +131,6 @@ class Inspection extends Model
                 ->where('inspection_projecttool.id', '=', $this->getRelationShip()[1][0]->id)
                 ->get();
             $tool_id = Tool::find($dataWithRelation->get()[0]->tool_id)->id;
-
         }
         return $tool_id;
     }
@@ -142,16 +141,12 @@ class Inspection extends Model
         $lastInspectionToolDateTime= explode(' ', $this->LastRow(DB::table('inspection_tool'),$tool_id,'created_at'));
         $projectToolTable =$data->where('inspection_id','!=',null);
         $lastProjectToolTableDateTime = explode(' ',$this->LastRow($projectToolTable,$tool_id,'inspection_projecttool.created_at'));
+        $lastDateInspections = $lastInspectionToolDateTime[0] >= $lastProjectToolTableDateTime[0] &&  $lastInspectionToolDateTime[1] > $lastProjectToolTableDateTime[1] ? $lastInspectionToolDateTime :$lastProjectToolTableDateTime;
 
-        if ($inspectionDateTime[0] ==$lastInspectionToolDateTime[0] && $inspectionDateTime[1] ==$lastInspectionToolDateTime[1]){
+        if ($inspectionDateTime[0] ==$lastDateInspections[0] && $inspectionDateTime[1] ==$lastDateInspections[1]){
             return true;
-        }elseif($inspectionDateTime[0] ==   $lastProjectToolTableDateTime[0] && $inspectionDateTime[1] == $lastProjectToolTableDateTime[1]){
-           return  true;
-        }else{
-           return  false;
         }
-
-
+           return  false;
     }
 
     /**
@@ -166,15 +161,16 @@ class Inspection extends Model
         // Only delete inspection when not exist a reparation associate;
         $tool = Tool::find($tool_id);
         if(($tool->status_tools_id == 1 ||$tool->status_tools_id == 2) && $this->isLastInspection($tool_id)==true){
-
             if($this-> getRelationShip()[0]=="inspectionTool"){
-                $this->updToolStatusTool($tool_id,1);
+                $this->updToolStatusTool($tool_id,2);
+                $inspectionTool= Inspection_Tool::where('inspection_id','=',$this->id)->delete();
                 //Delete Inspection line
             }elseif($this-> getRelationShip()[0]=="inspectionProjectTool"){
                $inspectionProjectTool= $this->inspectionProjectTool($this->id, $data = 'inspection_id');
                $inspectionProjectTool->inspection_id = null;
                $inspectionProjectTool->save();
                $tool->status_tools_id = 4;
+               $tool->save();
             }
             return true;
         }else{

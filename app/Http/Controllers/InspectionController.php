@@ -152,7 +152,6 @@ class InspectionController extends Controller
             if (!$inspection) {
                 throw new \Exception("Inspection with id: {$id} dont exist", 500);
             }
-            dd($inspection->validateDelete());
             if($inspection->validateDelete()){
                 $inspection->delete();
             }else{
