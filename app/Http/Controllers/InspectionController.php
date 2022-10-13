@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use function PHPUnit\Framework\isEmpty;
 
+
 class InspectionController extends Controller
 {
     public function index()
@@ -20,14 +21,17 @@ class InspectionController extends Controller
         $Auth=Auth::user();
 
         try {
-            //Inspection::returnInspection();
-
             Log::info("User with email {$Auth->email} get inspections successfully");
-            return response()->json(Inspection::with(['user'])->paginate(15)->each(function ($inspection) {
-                if($inspection->inspectionProjectTool($inspection->id, 'inspection_id')->count() >0 || $inspection->inspectionTool()->count()>0){
-                $inspection->getRelationToolOrProjectTool();
-                }
-            }), 200);
+            return response()->json(
+                tap(Inspection::with(['user'])->paginate(15),function($paginatedInstance){
+                    return $paginatedInstance->getCollection()->transform(function ($inspection) {
+                        if($inspection->inspectionProjectTool($inspection->id, 'inspection_id')->count() >0 || $inspection->inspectionTool()->count()>0){
+                            $inspection->getRelationToolOrProjectTool();
+                        }
+                        return $inspection;
+                    });
+                })
+            ,200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get  inspections but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -176,12 +180,17 @@ class InspectionController extends Controller
 
         try {
             Log::info("User with email {$Auth->email} get missing inspections  successfully");
-            return response()->json(Inspection::missingInspections()->each(function ($inspection) {
-                $projectTool = ProjectTool::find($inspection->project_tools_id);
-                $inspection->project = $projectTool->project;
-                $inspection->tool = $projectTool->tool;
 
-            }), 200);
+            return response()->json(
+                tap(Inspection::missingInspections(false)->paginate(15),function($paginatedInstance){
+                    return $paginatedInstance->getCollection()->transform(function ($inspection) {
+                        $projectTool = ProjectTool::find($inspection->project_tools_id);
+                        $inspection->project = $projectTool->project;
+                        $inspection->tool = $projectTool->tool;
+                        return $inspection;
+                    });
+                })
+            , 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get  missing inspections  but not successfully!");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
