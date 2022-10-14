@@ -94,8 +94,8 @@ class ToolController extends Controller
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-            if($groupTool->group_tools_id != $request->group_tools_id){
-                $groupTool = categoryTool::find($request->group_tools_id);
+            if($tool->group_tools_id != $request->group_tools_id){
+                $groupTool = groupTool::find($request->group_tools_id);
                 if(!$groupTool || !$groupTool->active)
                     throw new \Exception("The GroupTools is invalid!", 500);
             }
