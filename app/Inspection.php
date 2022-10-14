@@ -106,15 +106,17 @@ class Inspection extends Model
     }
     public  function  LastRow($table,$tool_id,$date){
 
-
         $filterTable=  $table->where("tool_id", '=',$tool_id);
        if($filterTable->get()->isEmpty()){
            $inspectionDateTime= explode(' ', $this->created_at->ToDateTimeString());
            $inspectionDateTime[0] =  Carbon::parse(  $inspectionDateTime[0].' -30 days')->ToDateString();
            return $inspectionDateTime[0].' '.$inspectionDateTime[1];
        }
-        return $filterTable
-           ->orderBy($date, 'desc')->first()->created_at;
+        $filterTable = $filterTable->orderBy($date, 'desc')->first();
+
+        $inspectionDate = Inspection::find($filterTable->inspection_id);
+
+        return  $inspectionDate->created_at;
     }
     public  function  GetProjectToolsWithJoin(){
         return DB::table('inspection_projecttool')
@@ -167,9 +169,9 @@ class Inspection extends Model
         $tool = Tool::find($tool_id);
 
         if(($tool->status_tools_id == 1 ||$tool->status_tools_id == 2) && $this->isLastInspection($tool_id)==true){
-            if($this-> getRelationShip()[0]=="inspectionTool"){
+            if($this->getRelationShip()[0]=="inspectionTool"){
                 $this->updToolStatusTool($tool_id,2);
-                $inspectionTool= Inspection_Tool::where('inspection_id','=',$this->id)->delete();
+                Inspection_Tool::where('inspection_id','=',$this->id)->delete();
                 //Delete Inspection line
             }elseif($this-> getRelationShip()[0]=="inspectionProjectTool"){
                $inspectionProjectTool= $this->inspectionProjectTool($this->id, $data = 'inspection_id');
