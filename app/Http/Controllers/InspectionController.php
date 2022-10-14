@@ -22,12 +22,12 @@ class InspectionController extends Controller
 
         try {
             Log::info("User with email {$Auth->email} get inspections successfully");
-            $inpections = Inspection::with(['user']);
+            $inspections = Inspection::with(['user']);
             return response()->json(
-                !$inpections->count() ?
+                !$inspections->count() ?
                     $inspections->get()
                 :
-                tap($inpections->paginate(15),function($paginatedInstance){
+                tap($inspections->paginate(15),function($paginatedInstance){
                     return $paginatedInstance->getCollection()->transform(function ($inspection) {
                         if($inspection->inspectionProjectTool($inspection->id, 'inspection_id')->count() >0 || $inspection->inspectionTool()->count()>0){
                             $inspection->getRelationToolOrProjectTool();
@@ -168,6 +168,7 @@ class InspectionController extends Controller
             }
 
             if($inspection->validateDelete()){
+
                 $inspection->delete();
             }else{
                 throw new \Exception("Inspection with id: {$id} cannot be  deleted", 500);
@@ -175,7 +176,7 @@ class InspectionController extends Controller
 
             Log::info("User with email {$Auth->email} deleted inspection number {$id}");
             return response()->json(['message' => 'Deleted'], 200);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try access destroy  on  inspection but  is not possible!Message error({$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
