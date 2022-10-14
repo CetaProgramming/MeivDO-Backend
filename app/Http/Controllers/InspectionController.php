@@ -137,9 +137,10 @@ class InspectionController extends Controller
 
             $tool_id = $inspection->GetInspectionToolId();
 
-            if($request->status != $inspection->status &&  $inspection->isLastInspection($tool_id)==true){
-
-                $inspection->updStatusTool($inspection->getRelationShip(),$request->status);
+            if( $inspection->isLastInspection($tool_id)==true){
+                if($request->status != $inspection->status ){
+                    $inspection->updStatusTool($inspection->getRelationShip(),$request->status);
+                }
                 $inspection->additionalDescription=$request->additionalDescription;
                 $inspection->user_id=$Auth->id;
                 $inspection->status=$request->status;
@@ -184,7 +185,7 @@ class InspectionController extends Controller
 
         try {
             Log::info("User with email {$Auth->email} get missing inspections  successfully");
-            
+
             $inspections = Inspection::missingInspections(false);
 
             return response()->json(
