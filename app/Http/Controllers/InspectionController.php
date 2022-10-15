@@ -22,12 +22,12 @@ class InspectionController extends Controller
 
         try {
             Log::info("User with email {$Auth->email} get inspections successfully");
-            $inpections = Inspection::with(['user']);
+            $inspections = Inspection::with(['user']);
             return response()->json(
-                !$inpections->count() ?
+                !$inspections->count() ?
                     $inspections->get()
                 :
-                tap($inpections->paginate(15),function($paginatedInstance){
+                tap($inspections->paginate(15),function($paginatedInstance){
                     return $paginatedInstance->getCollection()->transform(function ($inspection) {
                         if($inspection->inspectionProjectTool($inspection->id, 'inspection_id')->count() >0 || $inspection->inspectionTool()->count()>0){
                             $inspection->getRelationToolOrProjectTool();
@@ -69,7 +69,7 @@ class InspectionController extends Controller
             $inspectionTool->inspection_id= $inspection->id;
             $inspectionTool->tool_id=$request->tool_id;
             $inspectionTool->save();
-            $inspection->updToolStatusTool($request->tool_id,$request->status);
+            $inspection->updToolStatusTool($request->tool_id,$request->status ? 2 : 1);
 
             Log::info("User with email { $Auth->email} created inspection number { $inspection-->id}");
             return response()->json($inspection->load([]), 201);
