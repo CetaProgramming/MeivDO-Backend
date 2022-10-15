@@ -26,9 +26,8 @@ class Inspection extends Model
     }
     function getRelationShipTable(){
         if($this->inspectionTool()->count()>0){
-            $tool = Tool::find($this->inspectionTool()[0]->tool_id);
-           // return ["Tool",$tool];
-            return ["Tool"=>$tool];
+            $tool = Tool::find($this->inspectionTool()[0]->tool_id)->load(['statusTools', 'groupTools', 'user']);
+            return ["tool"=>$tool];
         }
 
             $inspectionProject= $this->inspectionProjectTool($this->id, 'inspection_id')[0];
@@ -37,7 +36,7 @@ class Inspection extends Model
             $project = Project::find($project_tool->project_id);
 
 
-       return  ["Tool"=>$tool,"Project"=>$project];
+       return  ["tool"=>$tool,"project"=>$project];
 
 
     }
