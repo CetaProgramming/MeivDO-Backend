@@ -173,7 +173,7 @@ class InspectionController extends Controller
             }else{
                 throw new \Exception("Inspection with id: {$id} cannot be  deleted", 500);
             }
-
+            
             Log::info("User with email {$Auth->email} deleted inspection number {$id}");
             return response()->json(['message' => 'Deleted'], 200);
         } catch (\Exception $exception) {
