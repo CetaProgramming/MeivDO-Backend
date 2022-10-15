@@ -69,7 +69,7 @@ class InspectionController extends Controller
             $inspectionTool->inspection_id= $inspection->id;
             $inspectionTool->tool_id=$request->tool_id;
             $inspectionTool->save();
-            $inspection->updToolStatusTool($request->tool_id,$request->status);
+            $inspection->updToolStatusTool($request->tool_id,$request->status ? 2 : 1);
 
             Log::info("User with email { $Auth->email} created inspection number { $inspection-->id}");
             return response()->json($inspection->load([]), 201);
@@ -168,7 +168,6 @@ class InspectionController extends Controller
             }
 
             if($inspection->validateDelete()){
-
                 $inspection->delete();
             }else{
                 throw new \Exception("Inspection with id: {$id} cannot be  deleted", 500);
