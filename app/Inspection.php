@@ -32,7 +32,7 @@ class Inspection extends Model
 
             $inspectionProject= $this->inspectionProjectTool($this->id, 'inspection_id')[0];
             $project_tool = ProjectTool::find($inspectionProject->project_tools_id);
-            $tool = Tool::find($project_tool->tool_id);
+            $tool = Tool::find($project_tool->tool_id)->load(['statusTools', 'groupTools', 'user']);
             $project = Project::find($project_tool->project_id);
 
 
