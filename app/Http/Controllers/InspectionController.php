@@ -196,7 +196,7 @@ class InspectionController extends Controller
             $inspectionTool->tool_id=$request->tool_id;
             $inspectionTool->save();
             $inspection->updToolStatusTool($request->tool_id,$request->status ? 2 : 1);
-            $inspection->tool = $inspection->getRelationShipTable()['tool'];
+            $inspection->inspectionDetails = $inspection->getRelationShipTable();
 
             Log::info("User with email { $Auth->email} created inspection number { $inspection-->id}");
             return response()->json($inspection, 201);
