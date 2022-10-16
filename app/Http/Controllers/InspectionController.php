@@ -43,6 +43,71 @@ class InspectionController extends Controller
         }
     }
 
+     /**
+     * Filter inspection completed by tool, groupTools
+     * @param Request $request
+     * @return LengthAwarePaginator
+     */
+    public function searchCompletedInspections(Request $request){
+        try {
+            $Auth=Auth::user();
+
+            $validator = \Validator::make($request->all(), [
+                'tool_id' => 'nullable|integer|min:1',
+                'status' => 'nullable|boolean'
+            ]);
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first(), 500);
+            }
+    
+            Log::info("User with email { $Auth->email} made a search by completed on table inspection");
+            
+            $inspections = Inspection::with(['user']);
+
+            $collection = tap($inspections->paginate(15),function($paginatedInstance){
+                return $paginatedInstance->getCollection()->transform(function ($inspection, $key) {
+                    if($inspection->inspectionProjectTool($inspection->id, 'inspection_id')->count() >0 || $inspection->inspectionTool()->count()>0){
+                        $inspection->getRelationToolOrProjectTool();
+                    }
+                    if(request()->tool_id && ($inspection->inspectionDetails['tool']->id != request()->tool_id))
+                        return null;
+                    if(!is_null(request()->status) && $inspection->status != request()->status)
+                        return null;
+                    return $inspection;
+                });
+            });
+
+            $itemsTransformed = $collection->getCollection()->filter(function ($item) {
+                if($item)
+                    return $item;
+              });
+              
+              $itemsTransformedAndPaginated = new \Illuminate\Pagination\LengthAwarePaginator(
+                $itemsTransformed,
+                $collection->total(),
+                $collection->perPage(),
+                $collection->currentPage(), [
+                  'path' => \Request::url(),
+                  'query' => [
+                    'page' => $collection->currentPage()
+                  ]
+                ]
+              );
+
+            return response()->json(
+                !$inspections->count() ?
+                    $inspections->get()
+                :
+                $itemsTransformedAndPaginated
+            ,200);
+
+        } catch (\Exception $exception) {
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+
+        
+    }
+
     public function storeTool(Request $request)
     {
         $Auth=Auth::user();
