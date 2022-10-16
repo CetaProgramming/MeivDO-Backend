@@ -63,10 +63,11 @@ Route::middleware(['auth:sanctum'])->group(function (){
         //Inspections
         Route::get('/inspections', 'InspectionController@index');
         Route::post('/inspections/tool', 'InspectionController@storeTool');
-        Route::post('/inspections/projecttool', 'InspectionController@storeProjectTool');
         Route::put('/inspections/{id}', 'InspectionController@update');
-        Route::get('/inspections/projecttool/missing', 'InspectionController@indexProjectTool');
         Route::get('/inspections/search', 'InspectionController@searchCompletedInspections');
+        Route::post('/inspections/projecttool', 'InspectionController@storeProjectTool');
+        Route::get('/inspections/projecttool/missing', 'InspectionController@indexProjectTool');
+        Route::get('/inspections/projecttool/missing/search', 'InspectionController@searchMissingInspections');
         Route::delete('/inspections/{id}', 'InspectionController@destroy');
     });
     Route::get('/user', 'LoginController@user');
