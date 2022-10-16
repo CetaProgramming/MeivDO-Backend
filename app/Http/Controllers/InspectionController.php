@@ -196,9 +196,10 @@ class InspectionController extends Controller
             $inspectionTool->tool_id=$request->tool_id;
             $inspectionTool->save();
             $inspection->updToolStatusTool($request->tool_id,$request->status ? 2 : 1);
+            $inspection->tool = $inspection->getRelationShipTable()['tool'];
 
             Log::info("User with email { $Auth->email} created inspection number { $inspection-->id}");
-            return response()->json($inspection->load([]), 201);
+            return response()->json($inspection, 201);
         } catch (\Exception $exception) {
             Log::error("User with email { $Auth->email} receive an error on inspection( {$exception->getMessage()})");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
