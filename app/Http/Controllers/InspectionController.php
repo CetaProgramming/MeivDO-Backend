@@ -44,7 +44,7 @@ class InspectionController extends Controller
     }
 
      /**
-     * Filter inspection completed by tool, groupTools
+     * Filter inspection completed by tool, status
      * @param Request $request
      * @return LengthAwarePaginator
      */
@@ -103,9 +103,70 @@ class InspectionController extends Controller
 
         } catch (\Exception $exception) {
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
-        }
+        }        
+    }
 
-        
+     /**
+     * Filter inspection missing by tool, project
+     * @param Request $request
+     * @return LengthAwarePaginator
+     */
+    public function searchMissingInspections(Request $request){
+        try {
+            $Auth=Auth::user();
+
+            $validator = \Validator::make($request->all(), [
+                'tool_id' => 'nullable|integer|min:1',
+                'project_id' => 'nullable|integer|min:1'
+            ]);
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first(), 500);
+            }
+    
+            Log::info("User with email { $Auth->email} made a search by completed on table inspection");
+            
+            $inspections = Inspection::missingInspections(false);
+
+            $collection = tap($inspections->paginate(15),function($paginatedInstance){
+                return $paginatedInstance->getCollection()->transform(function ($inspection) {
+                    $projectTool = ProjectTool::find($inspection->project_tools_id);
+                    $inspection->project = $projectTool->project;
+                    $inspection->tool = $projectTool->tool;
+                    if(request()->tool_id && $inspection->tool->id != request()->tool_id)
+                        return null;
+                    if(request()->project_id && $inspection->project->id != request()->project_id)
+                        return null;
+                    return $inspection;
+                });
+            });
+
+            $itemsTransformed = $collection->getCollection()->filter(function ($item) {
+                if($item)
+                    return $item;
+              });
+              
+              $itemsTransformedAndPaginated = new \Illuminate\Pagination\LengthAwarePaginator(
+                $itemsTransformed,
+                $collection->total(),
+                $collection->perPage(),
+                $collection->currentPage(), [
+                  'path' => \Request::url(),
+                  'query' => [
+                    'page' => $collection->currentPage()
+                  ]
+                ]
+              );
+
+            return response()->json(
+                !$inspections->count() ?
+                    $inspections->get()
+                :
+                $itemsTransformedAndPaginated
+            ,200);
+
+        } catch (\Exception $exception) {
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }        
     }
 
     public function storeTool(Request $request)
