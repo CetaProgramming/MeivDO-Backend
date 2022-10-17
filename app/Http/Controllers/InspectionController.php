@@ -261,12 +261,11 @@ class InspectionController extends Controller
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-
             $tool_id = $inspection->GetInspectionToolId();
-
+            
             if( $inspection->isLastInspection($tool_id)==true){
-                if($request->status != $inspection->status ){
-                    $inspection->updStatusTool($inspection->getRelationShip(),$request->status);
+                if($request->status != $inspection->status){
+                    $inspection->updStatusTool($inspection->getRelationShip(),$request->status ? 2 : 1);
                 }
                 $inspection->additionalDescription=$request->additionalDescription;
                 $inspection->user_id=$Auth->id;
