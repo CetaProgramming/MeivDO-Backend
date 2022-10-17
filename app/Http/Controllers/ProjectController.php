@@ -17,7 +17,6 @@ class ProjectController extends Controller
         $Auth=Auth::user();
 
         try {
-
             Log::info("User with email {$Auth->email} get projects successfully");
             return response()->json(Project::with(['projectTools','user'])->paginate(15), 200);
         } catch (\Exception $exception) {
@@ -64,11 +63,12 @@ class ProjectController extends Controller
                 'name' => 'required|unique:projects,name,null,id,deleted_at,NULL',
                 $request->startDate && 'startDate' => 'date_format:Y/m/d|after_or_equal:today',
                 $request->endDate && 'endDate' => 'nullable|date_format:Y/m/d|after_or_equal:startDate',
-
+                'tools' => 'nullable|array'
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
+            
             $project= new project();
             $project->name=$request->name;
             $project->address= $request->address ?? null;
@@ -77,6 +77,20 @@ class ProjectController extends Controller
             $project->endDate=$request->endDate ?? null;
             $project->user_id=$Auth->id;
             $project->save();
+            if($request->tools)
+                foreach ($request->tools as $tool) {
+                    $toolInstance=Tool::find($tool);
+                    if(!$toolInstance || $toolInstance->status_tools_id != 2 || !$toolInstance->active)
+                        continue;
+                    $projectTool = new ProjectTool();
+                    $projectTool->tool_id = $tool;
+                    $projectTool->project_id = $project->id;
+                    $projectTool->user_id = $Auth->id;
+                    $projectTool->save();
+                    $toolInstance->status_tools_id=3;
+                    $toolInstance->save();
+                }
+            
             Log::info("User with email { $Auth->email} created project number { $project->id}");
             return response()->json($project->load(['projectTools','user']), 201);
         } catch (\Exception $exception) {
@@ -97,6 +111,7 @@ class ProjectController extends Controller
             'name' => 'required|unique:projects,name,'.$project->id.',id,deleted_at,NULL',
             $request->startDate && 'startDate' => 'date_format:Y/m/d|after_or_equal:today',
             $request->endDate && 'endDate' => 'nullable|date_format:Y/m/d|after_or_equal:startDate',
+            'tools' => 'nullable|array'
         ]);
         if ($validator->fails()) {
             throw new \Exception($validator->errors()->first(), 500);
@@ -106,6 +121,32 @@ class ProjectController extends Controller
         $request->startDate && $project->startDate = $request->startDate;
         $project->endDate=$request->endDate;
         $project->user_id=$Auth->id;
+
+        if($request->tools){
+            foreach ($project->projectTools as $projectTool) {
+                if(in_array($projectTool->tool_id, $request->tools))
+                    continue;
+                $projectTool = ProjectTool::find($projectTool->id);
+                $projectTool->delete();
+                $toolInstance= Tool::find($projectTool->tool_id);
+                $toolInstance->status_tools_id=2;
+                $toolInstance->save();
+            }
+            foreach ($request->tools as $tool) {
+                $toolInstance=Tool::find($tool);
+                if(!$toolInstance || $toolInstance->status_tools_id != 2 || !$toolInstance->active)
+                    continue;
+                    $projectTool = new ProjectTool();
+                    $projectTool->tool_id = $tool;
+                    $projectTool->project_id = $project->id;
+                    $projectTool->user_id = $Auth->id;
+                    $projectTool->save();
+                    $toolInstance= Tool::find($tool);
+                    $toolInstance->status_tools_id = 3;
+                    $toolInstance->save();
+            }
+        }
+            
         $project->save();
         Log::info("User with email {$Auth->email} updated project  number {$id} successfully");
         return response()->json($project->load(['projectTools','user']), 200);
