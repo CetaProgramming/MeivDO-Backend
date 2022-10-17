@@ -122,7 +122,8 @@ class ProjectController extends Controller
         $project->endDate=$request->endDate;
         $project->user_id=$Auth->id;
 
-        if($request->tools){
+        $request->tools ?? $request->tools=[];
+
             foreach ($project->projectTools as $projectTool) {
                 if(in_array($projectTool->tool_id, $request->tools))
                     continue;
@@ -144,7 +145,6 @@ class ProjectController extends Controller
                     $toolInstance= Tool::find($tool);
                     $toolInstance->status_tools_id = 3;
                     $toolInstance->save();
-            }
         }
             
         $project->save();
