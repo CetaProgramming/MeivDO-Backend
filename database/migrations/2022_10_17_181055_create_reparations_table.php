@@ -16,7 +16,7 @@ class CreateReparationsTable extends Migration
         Schema::create('reparations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('inspection_id') -> constrained();
-            $table->integer('reason');
+            $table->string('reason');
             $table->string('solution');
             $table->string('additionalDescription');
             $table->boolean('status');
