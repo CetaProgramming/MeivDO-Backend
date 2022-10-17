@@ -262,7 +262,6 @@ class InspectionController extends Controller
                 throw new \Exception($validator->errors()->first(), 500);
             }
             $tool_id = $inspection->GetInspectionToolId();
-            
             if( $inspection->isLastInspection($tool_id)==true){
                 if($request->status != $inspection->status){
                     $inspection->updStatusTool($inspection->getRelationShip(),$request->status ? 2 : 1);
@@ -275,9 +274,9 @@ class InspectionController extends Controller
                 throw new \Exception("Inspection with id: {$id} cannot be updated", 500);
             }
 
-
+            $inspection->getRelationToolOrProjectTool();
             Log::info("User with email {$Auth->email} updated inspection number {$id} successfully");
-            return response()->json($inspection->load([]), 200);
+            return response()->json($inspection, 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try access update on inspection but is not possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
