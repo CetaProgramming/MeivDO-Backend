@@ -21,7 +21,10 @@ class Reparation extends Model
 
         $this->save();
     }
-    public function  deleteReparation(){
-        $this->delete();
+    public function isReparationFinish(){
+
+    }
+    public function  updateReparation(){
+
     }
 }
