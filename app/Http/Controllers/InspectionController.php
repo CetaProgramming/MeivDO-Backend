@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\Inspection;
+use App\Reparation;
 use  App\Tool;
 use  App\StatusTool;
 use App\ProjectTool;
@@ -59,9 +60,9 @@ class InspectionController extends Controller
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-    
+
             Log::info("User with email { $Auth->email} made a search by completed on table inspection");
-            
+
             $inspections = Inspection::with(['user']);
 
             $collection = tap($inspections->paginate(15),function($paginatedInstance){
@@ -81,7 +82,7 @@ class InspectionController extends Controller
                 if($item)
                     return $item;
               });
-              
+
               $itemsTransformedAndPaginated = new \Illuminate\Pagination\LengthAwarePaginator(
                 $itemsTransformed,
                 $collection->total(),
@@ -103,7 +104,7 @@ class InspectionController extends Controller
 
         } catch (\Exception $exception) {
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
-        }        
+        }
     }
 
      /**
@@ -122,9 +123,9 @@ class InspectionController extends Controller
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-    
+
             Log::info("User with email { $Auth->email} made a search by completed on table inspection");
-            
+
             $inspections = Inspection::missingInspections(false);
 
             $collection = tap($inspections->paginate(15),function($paginatedInstance){
@@ -144,7 +145,7 @@ class InspectionController extends Controller
                 if($item)
                     return $item;
               });
-              
+
               $itemsTransformedAndPaginated = new \Illuminate\Pagination\LengthAwarePaginator(
                 $itemsTransformed,
                 $collection->total(),
@@ -166,7 +167,7 @@ class InspectionController extends Controller
 
         } catch (\Exception $exception) {
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
-        }        
+        }
     }
 
     public function storeTool(Request $request)
@@ -195,6 +196,11 @@ class InspectionController extends Controller
             $inspectionTool->inspection_id= $inspection->id;
             $inspectionTool->tool_id=$request->tool_id;
             $inspectionTool->save();
+            if( $inspection->status==0){
+                $reparation = new Reparation();
+                $reparation->createReparation($Auth,$inspection->id);
+
+            }
             $inspection->updToolStatusTool($request->tool_id,$request->status ? 2 : 1);
             $inspection->inspectionDetails = $inspection->getRelationShipTable();
 
@@ -299,7 +305,7 @@ class InspectionController extends Controller
             }else{
                 throw new \Exception("Inspection with id: {$id} cannot be  deleted", 500);
             }
-            
+
             Log::info("User with email {$Auth->email} deleted inspection number {$id}");
             return response()->json(['message' => 'Deleted'], 200);
         } catch (\Exception $exception) {
