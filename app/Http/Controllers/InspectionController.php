@@ -199,7 +199,6 @@ class InspectionController extends Controller
             if( $inspection->status==0){
                 $reparation = new Reparation();
                 $reparation->createReparation($Auth,$inspection->id);
-
             }
             $inspection->updToolStatusTool($request->tool_id,$request->status ? 2 : 1);
             $inspection->inspectionDetails = $inspection->getRelationShipTable();
@@ -240,7 +239,10 @@ class InspectionController extends Controller
 
             Inspection::updInspectionId($request->inspection_projecttool_id, $inspection->id);
             Inspection::updProjectStatusTool($request->inspection_projecttool_id, $request->status);
-
+            if( $inspection->status==0){
+                $reparation = new Reparation();
+                $reparation->createReparation($Auth,$inspection->id);
+            }
             Log::info("User with email { $Auth->email} created inspection number { $inspection-->id}");
             return response()->json($inspection->load([]), 201);
         } catch (\Exception $exception) {
@@ -268,8 +270,18 @@ class InspectionController extends Controller
                 throw new \Exception($validator->errors()->first(), 500);
             }
             $tool_id = $inspection->GetInspectionToolId();
+
+
+
             if( $inspection->isLastInspection($tool_id)==true){
                 if($request->status != $inspection->status){
+                    if($request->status ==0){
+                        $reparation = new Reparation();
+                        $reparation->createReparation($Auth,$inspection->id);
+                    }else{
+                        $reparation= Reparation::where('inspection_id',$inspection->id);
+                        $reparation->delete();
+                    }
                     $inspection->updStatusTool($inspection->getRelationShip(),$request->status ? 2 : 1);
                 }
                 $inspection->additionalDescription=$request->additionalDescription;

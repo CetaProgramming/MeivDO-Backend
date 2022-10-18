@@ -21,6 +21,7 @@ class CreateReparationsTable extends Migration
             $table->string('additionalDescription');
             $table->boolean('status');
             $table->foreignId('user_id') -> constrained();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
