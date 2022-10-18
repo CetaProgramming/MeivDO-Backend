@@ -72,6 +72,7 @@ Route::middleware(['auth:sanctum'])->group(function (){
         //Reparations
         Route::get('/repairs/completed', 'ReparationController@indexRepairsCompleted');
         Route::get('/repairs/missing', 'ReparationController@indexRepairsMissing');
+        Route::put('/repairs/{id}', 'ReparationController@update');
     });
     Route::get('/user', 'LoginController@user');
     Route::put('/changePassword','UserController@updatePassword');
