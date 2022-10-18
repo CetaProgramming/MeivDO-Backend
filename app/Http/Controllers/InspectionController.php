@@ -82,9 +82,8 @@ class InspectionController extends Controller
                 if($item)
                     return $item;
               });
-
               $itemsTransformedAndPaginated = new \Illuminate\Pagination\LengthAwarePaginator(
-                $itemsTransformed,
+                $itemsTransformed->values(),
                 $collection->total(),
                 $collection->perPage(),
                 $collection->currentPage(), [
@@ -96,9 +95,6 @@ class InspectionController extends Controller
               );
 
             return response()->json(
-                !$inspections->count() ?
-                    $inspections->get()
-                :
                 $itemsTransformedAndPaginated
             ,200);
 
@@ -147,7 +143,7 @@ class InspectionController extends Controller
               });
 
               $itemsTransformedAndPaginated = new \Illuminate\Pagination\LengthAwarePaginator(
-                $itemsTransformed,
+                $itemsTransformed->values(),
                 $collection->total(),
                 $collection->perPage(),
                 $collection->currentPage(), [
@@ -159,9 +155,9 @@ class InspectionController extends Controller
               );
 
             return response()->json(
-                !$inspections->count() ?
-                    $inspections->get()
-                :
+                // !$inspections->count() ?
+                //     $inspections->get()
+                // :
                 $itemsTransformedAndPaginated
             ,200);
 
