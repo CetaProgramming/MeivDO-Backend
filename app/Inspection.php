@@ -126,8 +126,11 @@ class Inspection extends Model
             ->Rightjoin('project_tools', 'project_tools.id', '=', 'inspection_projecttool.project_tools_id');
     }
     public function  GetInspectionToolId(){
+
         $tool_id=0;
+
         if($this->getRelationShip()[0]=="inspectionTool"){
+
             $tool_id = $this->getRelationShip()[1][0]->tool_id;
 
         }elseif($this->getRelationShip()[0]=="inspectionProjectTool"){
@@ -172,6 +175,11 @@ class Inspection extends Model
         $tool = Tool::find($tool_id);
 
         if(($tool->status_tools_id == 1 ||$tool->status_tools_id == 2) && $this->isLastInspection($tool_id)==true){
+            $reparation= Reparation::where('inspection_id',$this->id)->get()[0];
+            if($reparation->status ==1){
+                throw new \Exception("Inspection with id: {$this->id} cannot be deleted because reparation is close", 500);
+            }
+            $reparation->delete();
             if($this->getRelationShip()[0]=="inspectionTool"){
                 $this->updToolStatusTool($tool_id,2);
                 Inspection_Tool::where('inspection_id','=',$this->id)->delete();
