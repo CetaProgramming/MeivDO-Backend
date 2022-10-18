@@ -275,7 +275,12 @@ class InspectionController extends Controller
                         $reparation = new Reparation();
                         $reparation->createReparation($Auth,$inspection->id);
                     }else{
-                        $reparation= Reparation::where('inspection_id',$inspection->id);
+
+                        $reparation= Reparation::where('inspection_id',$inspection->id)->get()[0];
+
+                        if($reparation->status ==1){
+                            throw new \Exception("Inspection with id: {$id} cannot be updated because reparation is close", 500);
+                        }
                         $reparation->delete();
                     }
                     $inspection->updStatusTool($inspection->getRelationShip(),$request->status ? 2 : 1);

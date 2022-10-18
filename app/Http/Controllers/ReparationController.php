@@ -54,6 +54,7 @@ class ReparationController extends Controller
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
+            $reparation->status =1;
             $reparation->user_id=$Auth->id;
             $reparation->update($request->all());
             Log::info("User with email {$Auth->email} updated reparation number {$id} successfully");
