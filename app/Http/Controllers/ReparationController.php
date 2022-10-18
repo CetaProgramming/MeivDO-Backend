@@ -37,4 +37,30 @@ class ReparationController extends Controller
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
+    public function update(Request $request,  $id)
+    {
+        $Auth=Auth::user();
+
+        try {
+            $reparation= Reparation::find($id);
+            if (!$reparation) {
+                throw new \Exception("Reparation with id: {$id} dont exist", 500);
+            }
+            $validator = \Validator::make($request->all(),[
+                'reason' => 'required|string',
+                'solution'=>'required|string',
+                'additionalDescription'=>'required|string',
+            ]);
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first(), 500);
+            }
+            $reparation->user_id=$Auth->id;
+            $reparation->update($request->all());
+            Log::info("User with email {$Auth->email} updated reparation number {$id} successfully");
+            return response()->json($reparation->load(['inspection']), 200);
+        } catch (\Exception $exception) {
+            Log::error("User with email {$Auth->email} try access update on reparation but is not possible!Message error({$exception->getMessage()}");
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+        }
+    }
 }

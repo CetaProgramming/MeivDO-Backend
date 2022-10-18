@@ -7,8 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reparation extends Model
 {
-    protected $fillable = ['tool_id','project_id','user_id'];
-
+    protected $fillable = ['reason','solution','additionalDescription'];
     use SoftDeletes;
     public  function  inspection(){
         return $this->belongsTo('App\Inspection');
