@@ -69,6 +69,9 @@ Route::middleware(['auth:sanctum'])->group(function (){
         Route::get('/inspections/projecttool/missing', 'InspectionController@indexProjectTool');
         Route::get('/inspections/projecttool/missing/search', 'InspectionController@searchMissingInspections');
         Route::delete('/inspections/{id}', 'InspectionController@destroy');
+        //Reparations
+        Route::get('/repairs/completed', 'ReparationController@indexRepairsCompleted');
+        Route::get('/repairs/missing', 'ReparationController@indexRepairsMissing');
     });
     Route::get('/user', 'LoginController@user');
     Route::put('/changePassword','UserController@updatePassword');

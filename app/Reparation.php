@@ -10,7 +10,9 @@ class Reparation extends Model
     protected $fillable = ['tool_id','project_id','user_id'];
 
     use SoftDeletes;
-
+    public  function  inspection(){
+        return $this->belongsTo('App\Inspection');
+    }
     public  function  createReparation($Auth,$inspectionId){
         $this->inspection_id = $inspectionId;
         $this->reason ="";
