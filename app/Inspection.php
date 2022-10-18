@@ -14,6 +14,9 @@ class Inspection extends Model
     public function user(){
         return $this->belongsTo('App\User');
     }
+    public  function  reparation(){
+        return $this->hasOne('App\Reparation');
+    }
     public function inspectionTool($column="inspection_id",$value=null){
 
         return DB::table('inspection_tool')
@@ -100,7 +103,7 @@ class Inspection extends Model
             'updated_at' => now()
         ]);
     }
-    
+
     static public function remInspectionProjectTool($projectToolId){
         DB::table('inspection_projecttool')->where('project_tools_id', '=', $projectToolId)->delete();
     }
@@ -164,10 +167,10 @@ class Inspection extends Model
 
         $tool_id =$this->GetInspectionToolId();
 
-        
+
         // Only delete inspection when not exist a reparation associate;
         $tool = Tool::find($tool_id);
-        
+
         if(($tool->status_tools_id == 1 ||$tool->status_tools_id == 2) && $this->isLastInspection($tool_id)==true){
             if($this->getRelationShip()[0]=="inspectionTool"){
                 $this->updToolStatusTool($tool_id,2);
