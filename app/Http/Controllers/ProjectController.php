@@ -68,7 +68,7 @@ class ProjectController extends Controller
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
             }
-            
+
             $project= new project();
             $project->name=$request->name;
             $project->address= $request->address ?? null;
@@ -90,7 +90,7 @@ class ProjectController extends Controller
                     $toolInstance->status_tools_id=3;
                     $toolInstance->save();
                 }
-            
+
             Log::info("User with email { $Auth->email} created project number { $project->id}");
             return response()->json($project->load(['projectTools','user']), 201);
         } catch (\Exception $exception) {
@@ -146,7 +146,7 @@ class ProjectController extends Controller
                     $toolInstance->status_tools_id = 3;
                     $toolInstance->save();
         }
-            
+
         $project->save();
         Log::info("User with email {$Auth->email} updated project  number {$id} successfully");
         return response()->json($project->load(['projectTools','user']), 200);
