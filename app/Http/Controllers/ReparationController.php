@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Inspection;
 use App\Reparation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,14 @@ class ReparationController extends Controller
         $Auth=Auth::user();
         try {
             Log::info("User with email {$Auth->email} get reparations successfully");
-            $reparations = Reparation::where('status',1)->with(['inspection'])->paginate(15);
+            $reparations=
+            tap(Reparation::where('status',1)->with(['inspection'])->paginate(15),function($paginatedInstance) {
+                return $paginatedInstance->getCollection()->transform(function ($reparation) {
+                    $inspection= Inspection::find($reparation->inspection_id);
+                    $reparation->inspection->tool =$inspection->getRelationShipTable()['tool'];
+                    return $reparation;
+                });
+            });
             return response()->json($reparations,200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get  reparations but not successfully!");
@@ -30,7 +38,14 @@ class ReparationController extends Controller
 
         try {
             Log::info("User with email {$Auth->email} get reparations successfully");
-            $reparations = Reparation::where('status', 0)->with(['inspection'])->paginate(15);
+            $reparations=
+                tap(Reparation::where('status',0)->with(['inspection'])->paginate(15),function($paginatedInstance) {
+                    return $paginatedInstance->getCollection()->transform(function ($reparation) {
+                        $inspection= Inspection::find($reparation->inspection_id);
+                        $reparation->inspection->tool =$inspection->getRelationShipTable()['tool'];
+                        return $reparation;
+                    });
+                });
             return response()->json($reparations, 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try get  reparations but not successfully!");
@@ -58,7 +73,10 @@ class ReparationController extends Controller
             $reparation->user_id=$Auth->id;
             $reparation->update($request->all());
             Log::info("User with email {$Auth->email} updated reparation number {$id} successfully");
-            return response()->json($reparation->load(['inspection']), 200);
+            $inspection= Inspection::find($reparation->inspection_id);
+            $reparation->inspection->tool =$inspection->getRelationShipTable()['tool'];
+
+            return response()->json($reparation,200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try access update on reparation but is not possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
@@ -75,8 +93,10 @@ class ReparationController extends Controller
             $inspectionId =$reparation->inspection_id;
             $reparation->user_id=$Auth->id;
             $reparation->createReparation($Auth,$inspectionId);
+            $inspection= Inspection::find($reparation->inspection_id);
+            $reparation->inspection->tool =$inspection->getRelationShipTable()['tool'];
             Log::info("User with email {$Auth->email} reseted reparation number {$id} successfully");
-            return response()->json($reparation->load(['inspection']), 200);
+            return response()->json($reparation, 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try access resete on reparation but is not possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
