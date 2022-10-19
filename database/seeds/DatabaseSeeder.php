@@ -19,11 +19,11 @@ class DatabaseSeeder extends Seeder
         $this->call(ComponentSeeder::class);
         $this->call(ComponentRoleRouteSeeder::class);
         $this->call(UserSeeder::class);
-        $this->call(CategoryToolSeeder::class);
+      $this->call(CategoryToolSeeder::class);
         $this->call(GroupToolSeeder::class);
         $this->call(StatusToolSeeder::class);
         $this->call(ToolSeeder::class);
-        $this->call(ProjectSeeder::class);
-        $this->call(ProjectToolSeeder::class);
+     //   $this->call(ProjectSeeder::class);
+        //$this->call(ProjectToolSeeder::class);
     }
 }

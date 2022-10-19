@@ -17,6 +17,7 @@ class Inspection extends Model
     public  function  reparation(){
         return $this->hasOne('App\Reparation');
     }
+
     public function inspectionTool($column="inspection_id",$value=null){
 
         return DB::table('inspection_tool')
