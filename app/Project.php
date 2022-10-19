@@ -4,16 +4,17 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use App\ProjectTool;
 class Project extends Model
 {
     protected $fillable = ['name','address','status','startDate','endDate'];
     use SoftDeletes;
     public function projectTools(){
-        return $this->hasMany('App\ProjectTool');
+        return $this->hasMany('App\ProjectTool')->with('tool');
     }
     public function user(){
         return $this->belongsTo('App\User');
+
     }
     protected static function booted()
     {
