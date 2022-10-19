@@ -164,7 +164,7 @@ class ReparationController extends Controller
             $validator = \Validator::make($request->all(),[
                 'reason' => 'required|string',
                 'solution'=>'required|string',
-                'additionalDescription'=>'required|string',
+                'additionalDescription'=>'string',
             ]);
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first(), 500);
