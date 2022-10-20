@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use App\Inspection;
 use App\Reparation;
+use App\Tool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -175,7 +176,12 @@ class ReparationController extends Controller
             Log::info("User with email {$Auth->email} updated reparation number {$id} successfully");
             $inspection= Inspection::find($reparation->inspection_id);
             $reparation->inspection->tool =$inspection->getRelationShipTable()['tool'];
-
+if($inspection->isLastInspection($reparation->inspection->tool->id)==true){
+            $tool = Tool::find($reparation->inspection->tool->id);
+            $tool->status_tools_id =2;
+            $tool->save();
+}
+            $reparation->inspection->tool =$inspection->getRelationShipTable()['tool'];
             return response()->json($reparation,200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try access update on reparation but is not possible!Message error({$exception->getMessage()}");
@@ -190,15 +196,26 @@ class ReparationController extends Controller
             if (!$reparation) {
                 throw new \Exception("Reparation with id: {$id} dont exist", 500);
             }
-            $inspectionId =$reparation->inspection_id;
-            $reparation->user_id=$Auth->id;
-            $reparation->createReparation($Auth,$inspectionId);
             $inspection= Inspection::find($reparation->inspection_id);
             $reparation->inspection->tool =$inspection->getRelationShipTable()['tool'];
-            Log::info("User with email {$Auth->email} reseted reparation number {$id} successfully");
+
+
+            if($inspection->isLastInspection($reparation->inspection->tool->id)==true) {
+                $inspectionId = $reparation->inspection_id;
+                $reparation->user_id = $Auth->id;
+                $reparation->createReparation($Auth, $inspectionId);
+                $reparation->inspection->tool = $inspection->getRelationShipTable()['tool'];
+                $tool = Tool::find($reparation->inspection->tool->id);
+                $tool->status_tools_id =1;
+                $tool->save();
+                $reparation->inspection->tool =$inspection->getRelationShipTable()['tool'];
+                Log::info("User with email {$Auth->email} reseted reparation number {$id} successfully");
+            }else{
+                throw new \Exception("Reparation with id: {$id} have to be the last reparation", 500);
+            }
             return response()->json($reparation, 200);
         } catch (\Exception $exception) {
-            Log::error("User with email {$Auth->email} try access resete on reparation but is not possible!Message error({$exception->getMessage()}");
+            Log::error("User with email {$Auth->email} try access reset on reparation but is not possible!Message error({$exception->getMessage()}");
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
