@@ -52,7 +52,7 @@ class ProjectToolController extends Controller
             return response()->json(['message' => 'Deleted'], 200);
         } catch (\Exception $exception) {
             Log::error("User with email {$Auth->email} try access destroy  on project tool but  is not possible!Message error({$exception->getMessage()})");
-            return response()->json(['error' => $exception->getMessage()->errors()->first()], $exception->getCode());
+            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
 }
