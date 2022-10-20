@@ -18,7 +18,7 @@ class CreateReparationsTable extends Migration
             $table->foreignId('inspection_id') -> constrained();
             $table->string('reason');
             $table->string('solution');
-            $table->string('additionalDescription');
+            $table->string('additionalDescription')->nullable();
             $table->boolean('status');
             $table->foreignId('user_id') -> constrained();
             $table->softDeletes();
