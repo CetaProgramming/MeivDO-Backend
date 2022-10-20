@@ -61,8 +61,8 @@ class ProjectController extends Controller
         try {
             $validator = \Validator::make($request->all(),[
                 'name' => 'required|unique:projects,name,null,id,deleted_at,NULL',
-                $request->startDate && 'startDate' => 'date_format:Y/m/d|after_or_equal:today',
-                $request->endDate && 'endDate' => 'nullable|date_format:Y/m/d|after_or_equal:startDate',
+                'startDate' => 'date_format:Y/m/d|after_or_equal:today',
+                'endDate' => 'nullable|date_format:Y/m/d|after_or_equal:startDate',
                 'tools' => 'nullable|array'
             ]);
             if ($validator->fails()) {
@@ -73,7 +73,7 @@ class ProjectController extends Controller
             $project->name=$request->name;
             $project->address= $request->address ?? null;
             $project->status=1;
-            $project->startDate= $request->startDate ?? now();
+            $project->startDate= $request->startDate ?? explode(' ', now())[0];
             $project->endDate=$request->endDate ?? null;
             $project->user_id=$Auth->id;
             $project->save();
@@ -109,8 +109,8 @@ class ProjectController extends Controller
         }
         $validator = \Validator::make($request->all(),[
             'name' => 'required|unique:projects,name,'.$project->id.',id,deleted_at,NULL',
-            $request->startDate && 'startDate' => 'date_format:Y/m/d|after_or_equal:today',
-            $request->endDate && 'endDate' => 'nullable|date_format:Y/m/d|after_or_equal:startDate',
+            'startDate' => 'date_format:Y/m/d|after_or_equal:today',
+            'endDate' => 'nullable|date_format:Y/m/d|after_or_equal:startDate',
             'tools' => 'nullable|array'
         ]);
         if ($validator->fails()) {
@@ -119,7 +119,7 @@ class ProjectController extends Controller
         $project->name=$request->name;
         $request->address && $project->address= $request->address;
         $request->startDate && $project->startDate = $request->startDate;
-        $project->endDate=$request->endDate;
+        $request->endDate && $project->endDate=$request->endDate;
         $project->user_id=$Auth->id;
 
         $request->tools ?? $request->tools=[];
