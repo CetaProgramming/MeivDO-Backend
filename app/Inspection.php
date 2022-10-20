@@ -110,16 +110,22 @@ class Inspection extends Model
     }
     public  function  LastRow($table,$tool_id,$date){
 
-        $filterTable=  $table->where("tool_id", '=',$tool_id);
-       if($filterTable->get()->isEmpty()){
-           $inspectionDateTime= explode(' ', $this->created_at->ToDateTimeString());
-           $inspectionDateTime[0] =  Carbon::parse(  $inspectionDateTime[0].' -30 days')->ToDateString();
-           return $inspectionDateTime[0].' '.$inspectionDateTime[1];
-       }
-        $filterTable = $filterTable->orderBy($date, 'desc')->first();
+        $filterTable= $table->where("tool_id", '=',$tool_id);
+        if($filterTable->get()->isEmpty()){
+            $inspectionDateTime= explode(' ', $this->created_at->ToDateTimeString());
+            $inspectionDateTime[0] =  Carbon::parse(  $inspectionDateTime[0].' -30 days')->ToDateString();
+            return $inspectionDateTime[0].' '.$inspectionDateTime[1];
+        }
+        $filterTableNew = $filterTable->orderBy($date, 'desc')->first();
+        
+        // dd(Inspection::find($filterTableNew->inspection_id));
 
-        $inspectionDate = Inspection::find($filterTable->inspection_id);
+        // dd($filterTableNew);
 
+        $inspectionDate = Inspection::find($filterTableNew->inspection_id);
+
+        // dd($inspectionDate);
+    
         return  $inspectionDate->created_at;
     }
     public  function  GetProjectToolsWithJoin(){
@@ -171,30 +177,29 @@ class Inspection extends Model
 
         $tool_id =$this->GetInspectionToolId();
 
-
         // Only delete inspection when not exist a reparation associate;
         $tool = Tool::find($tool_id);
-
         if(($tool->status_tools_id == 1 ||$tool->status_tools_id == 2) && $this->isLastInspection($tool_id)==true){
-            $reparation= Reparation::where('inspection_id',$this->id)->get()[0];
-            if($reparation->status ==1){
-                throw new \Exception("Inspection with id: {$this->id} cannot be deleted because reparation is close", 500);
+            $reparationGet = Reparation::where('inspection_id',$this->id)->get();
+            if($reparationGet->count()) {
+                $reparation= $reparationGet[0];
+                if($reparation->status ==1){
+                    throw new \Exception("Inspection with id: {$this->id} cannot be deleted because reparation is close", 500);
+                }
+                $reparation->delete();
             }
-            $reparation->delete();
-            if($this->getRelationShip()[0]=="inspectionTool"){
-                $this->updToolStatusTool($tool_id,2);
-                Inspection_Tool::where('inspection_id','=',$this->id)->delete();
-            }elseif($this-> getRelationShip()[0]=="inspectionProjectTool"){
-                $inspectionProjectTool= $this->inspectionProjectTool($this->id, $data = 'inspection_id');
-                self::updInspectionProjectTool($inspectionProjectTool[0]->id);
-                $this->updToolStatusTool($tool_id,4);
-            }
+                if($this->getRelationShip()[0]=="inspectionTool"){
+                    $this->updToolStatusTool($tool_id,2);
+                    Inspection_Tool::where('inspection_id','=',$this->id)->delete();
+                }elseif($this-> getRelationShip()[0]=="inspectionProjectTool"){
+                    $inspectionProjectTool= $this->inspectionProjectTool($this->id, $data = 'inspection_id');
+                    self::updInspectionProjectTool($inspectionProjectTool[0]->id);
+                    $this->updToolStatusTool($tool_id,4);
+                }
+
             return true;
         }else{
             return false;
         }
-
-
-
     }
 }
