@@ -36,32 +36,7 @@ class ProjectToolController extends Controller
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
-    //public function update(Request $request,  $id)
-    //{
-    //    $Auth=Auth::user();
-//
-     //   try {
-     //      $projectTool= projectTool::find($id);
-    //      if (!$projectTool) {
-    //          throw new \Exception("Project tool with id: {$id} dont exist", 500);
-    //      }
-    //      $validator = \Validator::make($request->all(),[
-    //           'tool_id' => 'required|exists:tools,id',
-    //            'project_id' => 'required|exists:projects,id',
-    //           'active' =>'required'
-    //      ]);
-    //      if ($validator->fails()) {
-    //          throw new \Exception($validator->errors()->first(), 500);
-    //       }
-//
-    //      $projectTool->update($request->all());
-    //      Log::info("User with email {$Auth->email} updated project tool number {$id} successfully");
-    //      return response()->json($projectTool->load(['user','tool','project']), 200);
-    //   } catch (\Exception $exception) {
-    //       Log::error("User with email {$Auth->email} try access update on  project tool but is not possible!Message error({$exception->getMessage()}");
-    //       return response()->json(['error' => $exception->getMessage()], $exception->getCode());
-    //    }
-    //  }
+
     public function destroy($id)
     {
         $Auth =Auth::user();
