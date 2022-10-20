@@ -25,9 +25,6 @@ class InspectionController extends Controller
             Log::info("User with email {$Auth->email} get inspections successfully");
             $inspections = Inspection::with(['user']);
             return response()->json(
-                !$inspections->count() ?
-                    $inspections->get()
-                :
                 tap($inspections->paginate(15),function($paginatedInstance){
                     return $paginatedInstance->getCollection()->transform(function ($inspection) {
                         if($inspection->inspectionProjectTool($inspection->id, 'inspection_id')->count() >0 || $inspection->inspectionTool()->count()>0){
@@ -155,9 +152,6 @@ class InspectionController extends Controller
               );
 
             return response()->json(
-                // !$inspections->count() ?
-                //     $inspections->get()
-                // :
                 $itemsTransformedAndPaginated
             ,200);
 
@@ -333,9 +327,6 @@ class InspectionController extends Controller
             $inspections = Inspection::missingInspections(false);
 
             return response()->json(
-                !$inspections->count() ?
-                    $inspections->get()
-                :
                 tap($inspections->paginate(15),function($paginatedInstance){
                     return $paginatedInstance->getCollection()->transform(function ($inspection) {
                         $projectTool = ProjectTool::find($inspection->project_tools_id);
