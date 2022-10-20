@@ -2,10 +2,14 @@
 
 namespace App;
 
+use Faker\Core\DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use phpDocumentor\Reflection\Types\Collection;
+
 class Inspection extends Model
 {
     protected $fillable = ['additionalDescription','status','user_id'];
@@ -18,16 +22,30 @@ class Inspection extends Model
         return $this->hasOne('App\Reparation');
     }
 
+    /**
+     * Get the inspectionTool of inspection
+     * @param string $column
+     * @param  integer $value
+     * @return \Illuminate\Support\Collection
+     */
     public function inspectionTool($column="inspection_id",$value=null){
 
         return DB::table('inspection_tool')
                 ->where($column, '=',$value ?? $this->id)->get();
     }
+    /**
+     * Get details inspection (project and tool)
+     * @return void
+     */
     public function getRelationToolOrProjectTool(){
 
         $this->inspectionDetails = $this->getRelationShipTable();
 
     }
+    /**
+     * Get the table of inspectionTool or inspectionProject of inspection
+     * @return array
+     */
     function getRelationShipTable(){
         if($this->inspectionTool()->count()>0){
             $tool = Tool::find($this->inspectionTool()[0]->tool_id)->load(['statusTools', 'groupTools', 'user']);
@@ -44,12 +62,22 @@ class Inspection extends Model
 
 
     }
+    /**
+     * Get the relationShip of inspectionTool or inspectionProject of inspection
+     * @return array
+     */
     public function getRelationShip(){
         if($this->inspectionTool()->count()){
             return ["inspectionTool",$this->inspectionTool()];
         }
         return ["inspectionProjectTool", $this->inspectionProjectTool($this->id, 'inspection_id')];
     }
+    /**
+     * Update status tool of inspection
+     * @param  array $relationShip
+     * @param  boolean $status
+     * @return void
+     */
     public function  updStatusTool($relationShip,$status){
         if($relationShip[0]=="inspectionTool"){
             $this->updToolStatusTool($relationShip[1][0]->tool_id,$status);
@@ -57,25 +85,54 @@ class Inspection extends Model
             $this->updProjectStatusTool($relationShip[1][0]->id,$status);
         }
     }
+    /**
+     * Update status tool
+     * @param  integer $tool_id
+     * @param  boolean $status
+     * @return void
+     */
     public function updToolStatusTool($tool_id,$status){
         $tool = Tool::find($tool_id);
         $tool->status_tools_id=$status;
         $tool->save();
     }
+    /**
+     * InspectionProjectTool of inspection
+     * @param  integer $projectToolId
+     * @param  string $data
+     * @return \Illuminate\Support\Collection
+     */
     static public function inspectionProjectTool($projectToolId, $data = 'project_tools_id'){
         return DB::table('inspection_projecttool')
         ->where($data, '=', $projectToolId)->get();
     }
+    /**
+     * Missing Inspections
+     * @param  boolean $withGet
+     * @return  \Illuminate\Support\Collection | \Illuminate\Database\Query\Builder
+     */
     static  public  function  missingInspections($withGet = true){
         $data = DB::table('inspection_projecttool')
         ->where('inspection_id', '=', null);
         return $withGet ? $data->get() : $data;
     }
+    /**
+     * Update Inspection id
+     * @param  integer $projectToolId
+     * @param  integer $inspectionId
+     * @return void
+     */
     static public function updInspectionId($projectToolId, $inspectionId){
         DB::table('inspection_projecttool')
         ->where('id', '=', $projectToolId)
         ->update(['inspection_id' => $inspectionId]);
     }
+    /**
+     * Update project Status Tool
+     * @param  integer $projectToolId
+     * @param  boolean $status
+     * @return void
+     */
     static public function updProjectStatusTool($projectToolId, $status){
         $data = DB::table('inspection_projecttool')
                     ->Rightjoin('project_tools', 'project_tools.id', '=', 'inspection_projecttool.project_tools_id')
@@ -89,6 +146,11 @@ class Inspection extends Model
         $tool->status_tools_id = $status ? 2 : 1;
         $tool->save();
     }
+    /**
+     * Add an Inspection Project Tool
+     * @param  integer $projectToolId
+     * @return void
+     */
     static public function addInspectionProjectTool($projectToolId){
         DB::table('inspection_projecttool')->insert([
             'inspection_id' => NULL,
@@ -97,6 +159,11 @@ class Inspection extends Model
             'project_tools_id' => $projectToolId
         ]);
     }
+    /**
+     * Add an Inspection Project Tool
+     * @param  integer $projectToolId
+     * @return void
+     */
     static public function updInspectionProjectTool($projectToolId){
         DB::table('inspection_projecttool')->where('id', $projectToolId)
         ->update([
@@ -105,9 +172,21 @@ class Inspection extends Model
         ]);
     }
 
+    /**
+     * Inspection Project Tool
+     * @param  integer $projectToolId
+     * @return void
+     */
     static public function remInspectionProjectTool($projectToolId){
         DB::table('inspection_projecttool')->where('project_tools_id', '=', $projectToolId)->delete();
     }
+    /**
+     * Show the LastRow
+     * @param  \Illuminate\Database\Query\Builder $table
+     * @param integer $tool_id
+     * @param  DateTime $date
+     * @return string
+     */
     public  function  LastRow($table,$tool_id,$date){
 
         $filterTable= $table->where("tool_id", '=',$tool_id);
@@ -117,21 +196,21 @@ class Inspection extends Model
             return $inspectionDateTime[0].' '.$inspectionDateTime[1];
         }
         $filterTableNew = $filterTable->orderBy($date, 'desc')->first();
-        
-        // dd(Inspection::find($filterTableNew->inspection_id));
-
-        // dd($filterTableNew);
-
         $inspectionDate = Inspection::find($filterTableNew->inspection_id);
-
-        // dd($inspectionDate);
-    
         return  $inspectionDate->created_at;
     }
+    /**
+     * Project Tools with join
+     * @return \Illuminate\Database\Query\Builder
+     */
     public  function  GetProjectToolsWithJoin(){
         return DB::table('inspection_projecttool')
             ->Rightjoin('project_tools', 'project_tools.id', '=', 'inspection_projecttool.project_tools_id');
     }
+    /**
+     * Inspection Tool id
+     * @return integer
+     */
     public function  GetInspectionToolId(){
 
         $tool_id=0;
@@ -149,6 +228,11 @@ class Inspection extends Model
         }
         return $tool_id;
     }
+    /**
+     * validate if the inspection is the last inspection
+     * @param integer $tool_id
+     * @return boolean
+     */
     public function isLastInspection($tool_id){
 
         $data = $this->GetProjectToolsWithJoin();
@@ -169,15 +253,13 @@ class Inspection extends Model
     }
 
     /**
-     * comentário
-     * @param
+     * validate if the  inspection can be deleted and delete the relation of the inspection
      * @return boolean
      */
     public  function  validateDelete(){
 
         $tool_id =$this->GetInspectionToolId();
 
-        // Only delete inspection when not exist a reparation associate;
         $tool = Tool::find($tool_id);
         if(($tool->status_tools_id == 1 ||$tool->status_tools_id == 2) && $this->isLastInspection($tool_id)==true){
             $reparationGet = Reparation::where('inspection_id',$this->id)->get();

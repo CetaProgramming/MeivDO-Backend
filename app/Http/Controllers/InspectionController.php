@@ -9,9 +9,11 @@ use  App\Tool;
 use  App\StatusTool;
 use App\ProjectTool;
 use App\Inspection_Tool;
+use Illuminate\Cache\LuaScripts;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rules\In;
 use function PHPUnit\Framework\isEmpty;
 
 
@@ -44,7 +46,7 @@ class InspectionController extends Controller
      /**
      * Filter inspection completed by tool, status
      * @param Request $request
-     * @return LengthAwarePaginator
+     * @return \Illuminate\Http\JsonResponse
      */
     public function searchCompletedInspections(Request $request){
         try {
@@ -103,7 +105,7 @@ class InspectionController extends Controller
      /**
      * Filter inspection missing by tool, project
      * @param Request $request
-     * @return LengthAwarePaginator
+     * @return \Illuminate\Http\JsonResponse
      */
     public function searchMissingInspections(Request $request){
         try {
@@ -160,6 +162,11 @@ class InspectionController extends Controller
         }
     }
 
+    /**
+     * Store inspection and inspectionTool using additionalDescription,status,tool_id
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function storeTool(Request $request)
     {
         $Auth=Auth::user();
@@ -200,7 +207,11 @@ class InspectionController extends Controller
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
-
+    /**
+     * Store inspection and inspectionProjectTool using additionalDescription,status,inspection_projecttool_id
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function storeProjectTool(Request $request)
     {
         $Auth=Auth::user();
@@ -241,7 +252,13 @@ class InspectionController extends Controller
         }
     }
 
-    public function update(Request $request,  $id)
+    /**
+     * Update inspection using additionalDescription,status
+     * @param Request $request
+     * @param  integer $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request,$id)
     {
         $Auth=Auth::user();
 
@@ -296,6 +313,11 @@ class InspectionController extends Controller
         }
     }
 
+    /**
+     * Delete inspection
+     * @param  integer $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function destroy($id)
     {
         $Auth =Auth::user();
@@ -318,6 +340,11 @@ class InspectionController extends Controller
             return response()->json(['error' => $exception->getMessage()], $exception->getCode());
         }
     }
+    /**
+     * Get missing inspections
+     * @param void
+     * @return  \Illuminate\Http\JsonResponse
+     */
     public function  indexProjectTool(){
         $Auth=Auth::user();
 
@@ -342,21 +369,4 @@ class InspectionController extends Controller
 
         }
     }
-   // /**
-    // * Update status tool with status inspection
-    // *
-    // * @param QueryBuilder $data
-    // * @param Boolean $status
-   //  * @return void
-   // */
-    //public function updatedStatusTool(\Illuminate\Support\Collection $data, bool $status){
-     //   if(!$data)
-     //       return;
-     //   $countData = count($data);
-     //   for($i=0; $i < $countData; $i++){
-      //      $tool = Tool::find($data[$i]->tool_id);
-      //      $tool->status_tools_id = filter_var($status, FILTER_VALIDATE_BOOLEAN) ? 2 : 1;
-      //      $tool->save();
-     //   }
-    //}
 }

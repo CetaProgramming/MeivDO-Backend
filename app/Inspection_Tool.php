@@ -9,7 +9,6 @@ class Inspection_Tool extends Model
 {
     protected $fillable = ['inspection_id','tool_id'];
     protected  $table = 'inspection_tool';
-    //use SoftDeletes;
 
     public function tool(){
 

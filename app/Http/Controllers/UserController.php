@@ -35,7 +35,7 @@ class UserController extends Controller
 
         $Auth=Auth::user();
         try {
-            //Link: https://laravel.com/docs/7.x/validation
+
             $validator = \Validator::make($request->all(), [
                 'active' => 'nullable|boolean'
             ]);
