@@ -61,7 +61,7 @@ class ProjectController extends Controller
         try {
             $validator = \Validator::make($request->all(),[
                 'name' => 'required|unique:projects,name,null,id,deleted_at,NULL',
-                'startDate' => 'date_format:Y/m/d|after_or_equal:today',
+                'startDate' => 'nullable|date_format:Y/m/d|after_or_equal:today',
                 'endDate' => 'nullable|date_format:Y/m/d|after_or_equal:startDate',
                 'tools' => 'nullable|array'
             ]);
@@ -74,8 +74,9 @@ class ProjectController extends Controller
             $project->address= $request->address ?? null;
             $project->status=1;
             $project->startDate= $request->startDate ?? explode(' ', now())[0];
-            $project->endDate=$request->endDate ?? null;
+            $project->endDate= $request->endDate;
             $project->user_id=$Auth->id;
+            // dd($project);
             $project->save();
             if($request->tools)
                 foreach ($request->tools as $tool) {
