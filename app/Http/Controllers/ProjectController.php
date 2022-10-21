@@ -61,8 +61,8 @@ class ProjectController extends Controller
         try {
             $validator = \Validator::make($request->all(),[
                 'name' => 'required|unique:projects,name,null,id,deleted_at,NULL',
-                'startDate' => 'nullable|date_format:Y/m/d|after_or_equal:today',
-                'endDate' => 'nullable|date_format:Y/m/d|after_or_equal:startDate',
+                'startDate' => 'nullable|date_format:Y-m-d',
+                'endDate' => 'nullable|date_format:Y-m-d|after_or_equal:startDate',
                 'tools' => 'nullable|array'
             ]);
             if ($validator->fails()) {
@@ -109,8 +109,8 @@ class ProjectController extends Controller
         }
         $validator = \Validator::make($request->all(),[
             'name' => 'required|unique:projects,name,'.$project->id.',id,deleted_at,NULL',
-            'startDate' => 'date_format:Y/m/d|after_or_equal:today',
-            'endDate' => 'nullable|date_format:Y/m/d|after_or_equal:startDate',
+            'startDate' => 'date_format:Y-m-d',
+            'endDate' => 'nullable|date_format:Y-m-d|after_or_equal:startDate',
             'tools' => 'nullable|array'
         ]);
         if ($validator->fails()) {
