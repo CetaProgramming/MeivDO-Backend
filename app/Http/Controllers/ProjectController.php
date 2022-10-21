@@ -76,7 +76,6 @@ class ProjectController extends Controller
             $project->startDate= $request->startDate ?? explode(' ', now())[0];
             $project->endDate= $request->endDate;
             $project->user_id=$Auth->id;
-            // dd($project);
             $project->save();
             if($request->tools)
                 foreach ($request->tools as $tool) {
