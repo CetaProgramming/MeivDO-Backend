@@ -18,7 +18,6 @@ class CreateProjectToolsTable extends Migration
             $table->foreignId('tool_id') -> constrained();
             $table->foreignId('project_id') -> constrained();
             $table->foreignId('user_id') -> constrained();
-            //$table->primary(['tool_id', 'project_id']);
             $table->softDeletes();
             $table->timestamps();
         });
