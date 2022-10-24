@@ -12,14 +12,14 @@ class CategoryToolSeeder extends Seeder
     public function run()
     {
         $arrayName= array(
-            'Martelos','Tesouras','Serrotes','Chaves'
+            'Tesouras','Martelos','Picadora','Serra'
         );
 
         foreach ($arrayName as $array){
             \DB::table('category_tools')->insert([
                 'name'      => $array ,
                 'active'=>1,
-                'user_id'=>2,
+                'user_id'=>1,
                 'created_at'=> now(),
                 'updated_at' =>now(),
             ]);
