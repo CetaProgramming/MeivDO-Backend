@@ -68,16 +68,6 @@ class ComponentRoleRouteSeeder extends Seeder
 
             [
                 'role_id' => 3,
-                'route_id' => [1],
-                'component_id' => 1
-            ],
-            [
-                'role_id' => 3,
-                'route_id' => [1],
-                'component_id' => 2
-            ],
-            [
-                'role_id' => 3,
                 'route_id' => [1,2,3,4],
                 'component_id' => 3
             ],
