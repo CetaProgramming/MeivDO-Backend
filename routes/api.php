@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['cors'])->group(function (){
 
 Route::post('/login', 'LoginController@login');
 Route::get('/logout', 'LoginController@logout');
@@ -82,6 +81,4 @@ Route::middleware(['auth:sanctum'])->group(function (){
     Route::get('/user', 'LoginController@user');
     Route::put('/changePassword','UserController@updatePassword');
     Route::put('/changeInfo','UserController@updateInfo');
-});
-
 });
