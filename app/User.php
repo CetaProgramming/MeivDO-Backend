@@ -18,7 +18,7 @@ class User extends Authenticatable
         return $this->hasMany('App\User');
     }
     public function groupTools(){
-        return $this->hasMany('App\groupTool','category_tools_id','id');
+        return $this->hasMany('App\groupTool');
     }
     public function categoryTools(){
         return $this->hasMany('App\categoryTool');
