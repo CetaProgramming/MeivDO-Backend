@@ -20,6 +20,7 @@ Route::get('/logout', 'LoginController@logout');
 
 
 Route::middleware(['auth:sanctum'])->group(function (){
+    Route::get('/tools', 'ToolController@index');
     Route::middleware(['isAccess'])->group(function () {
         //Users
         Route::post('/users', 'UserController@store');
@@ -45,7 +46,6 @@ Route::middleware(['auth:sanctum'])->group(function (){
         //StatusTool
         Route::get('/tools/status', 'StatusToolController@index');
         //Tool
-        Route::get('/tools', 'ToolController@index');
         Route::get('/tools/search', 'ToolController@searchData');
         Route::post('/tools', 'ToolController@store');
         Route::put('/tools/{id}', 'ToolController@update');
